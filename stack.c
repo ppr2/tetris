@@ -9,6 +9,10 @@ int size = 0;
 Node *stackTop = NULL_NODE;
 Node *stackBottom = NULL_NODE;
 
+State *stackPeek(void){
+    return stackTop->value;
+}
+
 State *stackPop(void){
     if(stackSize() <= 0){ return (State *)0; }
 
@@ -61,7 +65,7 @@ State *stackPushPopped(State state, int popped){
     return currentState;
 }
 
-int stackCutInHalf(State **states) {
+int stackSplit(State **states) {
     //TODO
     return 1;
 }

@@ -13,7 +13,7 @@ typedef struct{
 State *stackPop(void);
 State *stackPush(State state);
 State *stackPushPopped(State state, int popped);
-int stackCutInHalf(State **states);
+int stackSplit(State **states);
 
 int stackSize(void);
 
