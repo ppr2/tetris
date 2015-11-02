@@ -13,14 +13,9 @@
 /************************************************
  * GLOBAL VARIABLES
  ************************************************/
-
-// TODO stack of states
-// TODO operations array + index
-Shape operations[OP_ARR_LENGTH];
-unsigned int operationIndex = 0;
+char map[WIDTH][HEIGHT] = {0};
 
 int main() {
-    char map[WIDTH][HEIGHT] = {0};
     unsigned int index = 0;
 
     Node * currentNode;
@@ -33,13 +28,13 @@ int main() {
         /* Fit shape *currentNode->value->shape in map on place currentNode->value->index
          * and with map values of *currentNode->value->shape
          */
-        fit(*currentNode->value->shape, &map, currentNode->value->index, *currentNode->value->shape);
+        fit(currentNode->value->shape, currentNode->value->index, currentNode->value->shape);
         if (currentNode->popped || isLeaf(currentNode->value)) {
             removeFromStack();
 
             /* Unfit: replace current shape at old index with empty */
-            oldIndex = currentNode->value->index - shapeWidths[*currentNode->value->shape];
-            fit(*currentNode->value->shape, &map, oldIndex, EMPTY);
+            oldIndex = currentNode->value->index - shapeWidths[currentNode->value->shape];
+            fit(currentNode->value->shape, oldIndex, EMPTY);
 
             if (isLeaf(currentState)) {
                 storeBestScore();
@@ -54,17 +49,17 @@ int main() {
     return 0;
 }
 
-void branchFrom(State * state, char * map[], int index) {
-    int x = index / WIDTH - 1;
-    int y = index % WIDTH - 1;
+void branchFrom(State * state) {
+    int x = state->index / WIDTH - 1;
+    int y = state->index % WIDTH - 1;
     int hasBranched = 0;
     Shape shape;
 
     for (shape = EMPTY; shape <= STICK2; shape++) {
         /* Will it fit? */
-        if (fitable(shape, map, index)) {
-            State * newState = newState(index + shapeWidths[shape], shape);
-            pushToStack(newState);
+        if (fitable(shape, state->index)) {
+            State * createdState = newState(state->index + shapeWidths[shape], shape);
+            pushToStack(createdState);
         }
     }
 }
@@ -72,7 +67,7 @@ void branchFrom(State * state, char * map[], int index) {
 /*
  * return 0 if it doesn't fit
  * */
-int fitable(Shape shape, char * map[], int index) {
+int fitable(Shape shape, int index) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
@@ -81,22 +76,22 @@ int fitable(Shape shape, char * map[], int index) {
             return index + 1 < INDEX_MAX;
         case SQUARE:
             return x + 2 < WIDTH && y + 1 < HEIGHT
-                   && *map[x][y] == 0   && *map[x+1][y] == 0
-                   && *map[x][y+1] == 0 && *map[x+1][y+1] == 0;
+                   && map[x][y] == 0   && map[x+1][y] == 0
+                   && map[x][y+1] == 0 && map[x+1][y+1] == 0;
         case EL1:
             return x + 3 < WIDTH && y + 1 < HEIGHT
-                   && *map[x][y] == 0     && *map[x+1][y] == 0
-                   && *map[x+1][y] == 0   && *map[x+2][y] == 0
-                   && *map[x+3][y] == 0   && *map[x][y+1] == 0
-                   && *map[x+1][y+1] == 0 && *map[x+2][y+1] == 0
-                   && *map[x+3][y+1];
+                   && map[x][y] == 0     && map[x+1][y] == 0
+                   && map[x+1][y] == 0   && map[x+2][y] == 0
+                   && map[x+3][y] == 0   && map[x][y+1] == 0
+                   && map[x+1][y+1] == 0 && map[x+2][y+1] == 0
+                   && map[x+3][y+1];
     }
 }
 /*
  * Used to fit or unfit, depends on index and newValue.
  * Replace shape - shapeToFit - at index - index - with shape - newValue
  * */
-void fit(Shape shapeToFit, char * map[], int index, Shape newValue) {
+void fit(Shape shapeToFit, int index, Shape newValue) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
@@ -104,17 +99,17 @@ void fit(Shape shapeToFit, char * map[], int index, Shape newValue) {
         case EMPTY:
             break;
         case SQUARE:
-            *map[x][y]     = newValue;
-            *map[x+1][y]   = newValue;
-            *map[x][y+1]   = newValue;
-            *map[x+1][y+1] = newValue;
+            map[x][y]     = newValue;
+            map[x+1][y]   = newValue;
+            map[x][y+1]   = newValue;
+            map[x+1][y+1] = newValue;
             break;
         case EL1:
-            *map[x+3][y]   = newValue; /*        */
-            *map[x][y+1]   = newValue; /*     #  */
-            *map[x+1][y+1] = newValue; /*  ####  */
-            *map[x+2][y+1] = newValue; /*        */
-            *map[x+3][y+1] = newValue; /*        */
+            map[x+3][y]   = newValue; /*        */
+            map[x][y+1]   = newValue; /*     #  */
+            map[x+1][y+1] = newValue; /*  ####  */
+            map[x+2][y+1] = newValue; /*        */
+            map[x+3][y+1] = newValue; /*        */
             break;
         /* TODO case all remaining shapes */
     }

@@ -13,7 +13,7 @@ typedef struct operation {
 void branchFrom(State * state);
 int isLeaf(State * state);
 void storeBestScore();
-void fit(Shape shapeToFit, char * map[], int index, Shape newValue);
-int fitable(Shape shape, char * map[], int index);
+void fit(Shape shapeToFit, int index, Shape newValue);
+int fitable(Shape shape, int index);
 
 #endif //PPR2_TETRIS_MAIN_H
