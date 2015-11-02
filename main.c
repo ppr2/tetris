@@ -26,14 +26,20 @@ int main() {
     Node * currentNode;
     State* currentState;
     stackPush(newState(0, 0));
+    int oldIndex;
 
     while ( ! isStackEmpty()) {
         currentNode = peekFromStack();
-        fit(currentNode->value, &map);
-        currentNode->
+        /* Fit shape *currentNode->value->shape in map on place currentNode->value->index
+         * and with map values of *currentNode->value->shape
+         */
+        fit(*currentNode->value->shape, &map, currentNode->value->index, *currentNode->value->shape);
         if (currentNode->popped || isLeaf(currentNode->value)) {
             removeFromStack();
-            //TODO unFit(currentNode);
+
+            /* Unfit: replace current shape at old index with empty */
+            oldIndex = currentNode->value->index - shapeWidths[*currentNode->value->shape];
+            fit(*currentNode->value->shape, &map, oldIndex, EMPTY);
 
             if (isLeaf(currentState)) {
                 storeBestScore();
@@ -48,44 +54,25 @@ int main() {
     return 0;
 }
 
-int branchFrom(State * state, char * map[][], int index) {
+void branchFrom(State * state, char * map[], int index) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
     int hasBranched = 0;
     Shape shape;
-    int shapeWidth;
 
     for (shape = EMPTY; shape <= STICK2; shape++) {
         /* Will it fit? */
-        if (fit(shape, map, index, 0)) {
-            shapeWidth = getShapeWidth(shape);
-            /* Create new state */
-            State * newState; // TODO = (State) malloc(sizeof(State));
-            newState->index = index + shapeWidth;
-            newState->shape = shape;
-            /* Shut it up to stack */
+        if (fitable(shape, map, index)) {
+            State * newState = newState(index + shapeWidths[shape], shape);
             pushToStack(newState);
-            hasBranched = 1;
         }
-    }
-    return hasBranched;
-}
-
-int getShapeWidth(Shape shape) {
-    switch (shape) {
-        case EL1:
-        case EL2:
-        case EL3:
-        case EL4:
-            return 5;
-        /* TODO case all remaining shapes */
     }
 }
 
 /*
  * return 0 if it doesn't fit
  * */
-int fitable(Shape shape, char * map[][], int index) {
+int fitable(Shape shape, char * map[], int index) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
@@ -105,26 +92,29 @@ int fitable(Shape shape, char * map[][], int index) {
                    && *map[x+3][y+1];
     }
 }
-
-int fit(Shape shape, char * map[][], int index) {
+/*
+ * Used to fit or unfit, depends on index and newValue.
+ * Replace shape - shapeToFit - at index - index - with shape - newValue
+ * */
+void fit(Shape shapeToFit, char * map[], int index, Shape newValue) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
-    switch(shape) {
+    switch(shapeToFit) {
         case EMPTY:
             break;
         case SQUARE:
-            *map[x][y]     = SQUARE;
-            *map[x+1][y]   = SQUARE;
-            *map[x][y+1]   = SQUARE;
-            *map[x+1][y+1] = SQUARE;
+            *map[x][y]     = newValue;
+            *map[x+1][y]   = newValue;
+            *map[x][y+1]   = newValue;
+            *map[x+1][y+1] = newValue;
             break;
         case EL1:
-            *map[x+3][y]   = EL1; /*        */
-            *map[x][y+1]   = EL1; /*     #  */
-            *map[x+1][y+1] = EL1; /*  ####  */
-            *map[x+2][y+1] = EL1; /*        */
-            *map[x+3][y+1] = EL1; /*        */
+            *map[x+3][y]   = newValue; /*        */
+            *map[x][y+1]   = newValue; /*     #  */
+            *map[x+1][y+1] = newValue; /*  ####  */
+            *map[x+2][y+1] = newValue; /*        */
+            *map[x+3][y+1] = newValue; /*        */
             break;
         /* TODO case all remaining shapes */
     }
@@ -135,10 +125,7 @@ int isLeaf(State * state) {
     return state->index + 1 >= INDEX_MAX;
 }
 void storeBestScore() {
-
-}
-void unFit(State * state, char * map[]) {
-    // TODO subtract index
+ // TODO
 }
 
 /*
