@@ -33,13 +33,13 @@ int main() {
         /* Fit shape *currentNode->value->shape in map on place currentNode->value->index
          * and with map values of *currentNode->value->shape
          */
-        fit(*currentNode->value->shape, &map, currentNode->value->index, *currentNode->value->shape);
+        fit(currentNode->value->shape, &map, currentNode->value->index, currentNode->value->shape);
         if (currentNode->popped || isLeaf(currentNode->value)) {
             removeFromStack();
 
             /* Unfit: replace current shape at old index with empty */
-            oldIndex = currentNode->value->index - shapeWidths[*currentNode->value->shape];
-            fit(*currentNode->value->shape, &map, oldIndex, EMPTY);
+            oldIndex = currentNode->value->index - shapeWidths[currentNode->value->shape];
+            fit(currentNode->value->shape, &map, oldIndex, EMPTY);
 
             if (isLeaf(currentState)) {
                 storeBestScore();
@@ -72,7 +72,7 @@ void branchFrom(State * state, char * map[], int index) {
 /*
  * return 0 if it doesn't fit
  * */
-int fitable(Shape shape, char * map[], int index) {
+int fitable(Shape shape, char ** map[], int index) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
@@ -96,7 +96,7 @@ int fitable(Shape shape, char * map[], int index) {
  * Used to fit or unfit, depends on index and newValue.
  * Replace shape - shapeToFit - at index - index - with shape - newValue
  * */
-void fit(Shape shapeToFit, char * map[], int index, Shape newValue) {
+void fit(Shape shapeToFit, char ** map[], int index, Shape newValue) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
