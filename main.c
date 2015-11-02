@@ -1,6 +1,6 @@
 #include "main.h"
 #include "state.h"
-#include "stack.h"+-
+#include "stack.h"
 
 #define WIDTH 5
 #define HEIGHT 5
@@ -23,11 +23,7 @@ int main() {
 /*    int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;*/
 
-
-
-
-    State currentState;
-    Shape currentRotation;
+    Node * currentNode;
 
     /* TODO push not branched node */
     // currentState = (State) malloc(sizeof(State));
@@ -35,24 +31,18 @@ int main() {
     // pushToStack(newState);
 
     while ( ! isStackEmpty()) {
-        currentState = peekFromStack();
-        fit(currentState->shape, &map, currentState->index, 1);
-
-        if (currentState->branched || isLeaf(currentState)) {
+        currentNode = peekFromStack();
+        fit(currentNode->value, &map);
+        currentNode->
+        if (currentNode->popped || isLeaf(currentNode->value)) {
             removeFromStack();
-            deleteLastOperation();
-            currentRotation = operations[operationIndex];
-            operationIndex--; /* Going up the DFS tree */
-            // TODO undo last operation from map
+            //TODO unFit(currentNode);
 
-            // Is it leaf?
             if (isLeaf(currentState)) {
                 storeBestScore();
             }
         } else {
-            if (branchFrom(currentState)) {
-                operationIndex++; /* Going down the DFS tree */
-            }
+            branchFrom(currentState);
             currentState->branched = 1;
         }
         /* Check for other thread's requests here */
@@ -71,7 +61,7 @@ int branchFrom(State state, char * map[][], int index) {
     for (shape = EMPTY; shape <= STICK2; shape++) {
         /* Will it fit? */
         if (fit(shape, map, index, 0)) {
-            shapeWidth = getRotationWidth(shape);
+            shapeWidth = getShapeWidth(shape);
             /* Create new state */
             State * newState; // TODO = (State) malloc(sizeof(State));
             newState->index = index + shapeWidth;
@@ -84,7 +74,7 @@ int branchFrom(State state, char * map[][], int index) {
     return hasBranched;
 }
 
-int getRotationWidth(Shape shape) {
+int getShapeWidth(Shape shape) {
     switch (shape) {
         case EL1:
         case EL2:
