@@ -3,9 +3,11 @@
 
 #include "state.h"
 
-State newState(short depth) {
-    State state;
-    // mallocy a inicializace structu State
+State* newState(int index, Shape shape) {
+    State* state;
+    state = (State*)malloc(sizeof(State));
+    state->index = index;
+    state->shape = shape;
     return state;
 }
 

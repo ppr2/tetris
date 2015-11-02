@@ -34,16 +34,11 @@ State *stackPop(void){
     return state;
 }
 
-State *stackPush(State state){
-    return stackPushPopped(state, 0);
+State *stackPush(State* state){
+    return stackPushWithPoppedInfo(state, 0);
 }
 
-State *stackPushPopped(State state, int popped){
-    State *currentState = (State *)malloc(sizeof(State));
-    if(currentState == NULL){printf("Out of memory during push!"); exit(EXIT_FAILURE);}
-    
-    *currentState = state;
-
+State *stackPushWithPoppedInfo(State* currentState, int popped){
     Node *currentNode = (Node *)malloc(sizeof(Node));
     if(currentNode == NULL){printf("Out of memory during push!"); exit(EXIT_FAILURE);}
 

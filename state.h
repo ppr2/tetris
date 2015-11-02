@@ -73,7 +73,7 @@ typedef struct{
     Shape shape;
 } State;
 
-State newState(short depth);
+State* newState(int index, Shape shape);
 
 void freeState(State state);
 

@@ -11,8 +11,8 @@ typedef struct{
 
 // Operace na stacku
 State *stackPop(void);
-State *stackPush(State state);
-State *stackPushPopped(State state, int popped);
+State *stackPush(State* state);
+State *stackPushWithPoppedInfo(State* state, int popped);
 int stackSplit(State **states);
 
 int stackSize(void);

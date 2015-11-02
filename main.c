@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "main.h"
 #include "state.h"
 #include "stack.h"
@@ -20,15 +22,10 @@ unsigned int operationIndex = 0;
 int main() {
     char map[WIDTH][HEIGHT] = {0};
     unsigned int index = 0;
-/*    int x = index / WIDTH - 1;
-    int y = index % WIDTH - 1;*/
 
     Node * currentNode;
-
-    /* TODO push not branched node */
-    // currentState = (State) malloc(sizeof(State));
-    // index ma 0, shape = 0
-    // pushToStack(newState);
+    State* currentState;
+    stackPush(newState(0, 0));
 
     while ( ! isStackEmpty()) {
         currentNode = peekFromStack();
