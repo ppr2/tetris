@@ -58,35 +58,14 @@
  *
  * */
 
-typedef enum {
-    SQUARE, EL, STAIRS, TRIANGLE, STICK
-} Shape;
-typedef enum {
-    SQUARE = 1,
-    EL1, EL2, EL3, EL4, EL5, EL6, EL7, EL8,
-    STAIRS1, STAIRS2, STAIRS3, STAIRS4,
-    TRIANGLE1, TRIANGLE2, TRIANGLE3, TRIANGLE4,
-    STICK1, STICK2
-} Rotation;
 typedef struct operation {
     unsigned int index;
 
-};
-typedef struct State {
-    char branched = 0;
-    int index = 0;
-    Rotation rotation = 0;
-    char width;         /* Width of */
 };
 
 /************************************************
  * FUNCTION PROTOTYPES
  ************************************************/
-/* Stack can be global variable or local passed every time, up to you */
-int isStackEmpty();
-State * peekFromStack();
-void removeFromStack();
-void pushToStack(Stack * state);
 
 int branchFrom(State * state);
 int isLeaf(State state);

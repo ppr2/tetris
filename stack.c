@@ -74,6 +74,10 @@ int stackSize(void){
     return size;
 }
 
+int isStackEmpty(){
+    return (stackSize()==0)?1:0;
+}
+
 void deleteNode(Node *node){
     free(node->value);
     free(node);

@@ -1,4 +1,6 @@
 #include "main.h"
+#include "state.h"
+#include "stack.h"+-
 
 #define WIDTH 5
 #define HEIGHT 5
@@ -12,7 +14,7 @@
 
 // TODO stack of states
 // TODO operations array + index
-Rotation operations[OP_ARR_LENGTH];
+Shape operations[OP_ARR_LENGTH];
 unsigned int operationIndex = 0;
 
 int main() {
@@ -25,16 +27,16 @@ int main() {
 
 
     State currentState;
-    Rotation currentRotation;
+    Shape currentRotation;
 
     /* TODO push not branched node */
     // currentState = (State) malloc(sizeof(State));
+    // index ma 0, shape = 0
     // pushToStack(newState);
 
     while ( ! isStackEmpty()) {
         currentState = peekFromStack();
-        fit(currentState->rotation, &map, currentState->index, 1);
-        // TODO mark currentState operation to map
+        fit(currentState->shape, &map, currentState->index, 1);
 
         if (currentState->branched || isLeaf(currentState)) {
             removeFromStack();
@@ -44,7 +46,7 @@ int main() {
             // TODO undo last operation from map
 
             // Is it leaf?
-            if ( ! currentState->branched) {
+            if (isLeaf(currentState)) {
                 storeBestScore();
             }
         } else {
@@ -62,47 +64,42 @@ int main() {
 int branchFrom(State state, char * map[][], int index) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
-    Rotation rotation;
-    int rotationWidth;
+    int hasBranched = 0;
+    Shape shape;
+    int shapeWidth;
 
-    for (rotation = EL1; rotation <= STICK2; rotation++) {
+    for (shape = EMPTY; shape <= STICK2; shape++) {
         /* Will it fit? */
-        if (fit(rotation, map, index, 0)) {
-            rotationWidth = getRotationWidth(rotation);
+        if (fit(shape, map, index, 0)) {
+            shapeWidth = getRotationWidth(shape);
             /* Create new state */
             State * newState; // TODO = (State) malloc(sizeof(State));
-            newState->index = index + rotationWidth;
-            newState->rotation = rotation;
+            newState->index = index + shapeWidth;
+            newState->shape = shape;
             /* Shut it up to stack */
             pushToStack(newState);
+            hasBranched = 1;
         }
     }
-
-    /* Add new state with index + 1 and no rotation */
-    if (index + 1 < INDEX_MAX) {
-        /* Create new state */
-        State * newState; // TODO = (State) malloc(sizeof(State));
-        newState->index = index + 1;
-        /* Shut it up to stack */
-        pushToStack(newState);
-    }
+    return hasBranched;
 }
-int getRotationWidth(Rotation rotation) {
-    switch (rotation) {
+
+int getRotationWidth(Shape shape) {
+    switch (shape) {
         case EL1:
         case EL2:
         case EL3:
         case EL4:
             return 5;
-        /* TODO case all remaining rotations */
+        /* TODO case all remaining shapes */
     }
 }
 
-int fit(Rotation rotation, char * map[][], int index, int forReal) {
+int fit(Shape shape, char * map[][], int index, int forReal) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
-    switch(rotation) {
+    switch(shape) {
         case EL1:
             if (forReal) {
                 *map[x+3][y]   = EL1; /*        */
@@ -119,8 +116,8 @@ int fit(Rotation rotation, char * map[][], int index, int forReal) {
                         && *map[x+1][y+1] == 0 && *map[x+2][y+1] == 0
                         && *map[x+3][y+1];
             }
-        /* TODO case all remaining rotations */
-        /* In case of initial state where rotation is 0 do nothing */
+        /* TODO case all remaining shapes */
+        /* In case of initial state where shape is EMPTY do nothing */
         default:
             return 0;
     }

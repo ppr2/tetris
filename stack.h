@@ -16,6 +16,7 @@ State *stackPushPopped(State state, int popped);
 int stackSplit(State **states);
 
 int stackSize(void);
+int isStackEmpty();
 
 void deleteNode(Node *node);
 
