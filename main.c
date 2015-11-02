@@ -28,79 +28,102 @@ int main() {
     Rotation currentRotation;
 
     /* TODO push not branched node */
+    // currentState = (State) malloc(sizeof(State));
+    // pushToStack(newState);
 
     while ( ! isStackEmpty()) {
         currentState = peekFromStack();
-        //index += currentState->width;
+        fit(currentState->rotation, &map, currentState->index, 1);
+        // TODO mark currentState operation to map
 
         if (currentState->branched || isLeaf(currentState)) {
             removeFromStack();
             deleteLastOperation();
             currentRotation = operations[operationIndex];
-            index--;
+            operationIndex--; /* Going up the DFS tree */
+            // TODO undo last operation from map
 
             // Is it leaf?
             if ( ! currentState->branched) {
                 storeBestScore();
             }
         } else {
-            branchFrom(currentState);
+            if (branchFrom(currentState)) {
+                operationIndex++; /* Going down the DFS tree */
+            }
             currentState->branched = 1;
-            index++;
         }
         /* Check for other thread's requests here */
     }
 
-
-    /*
-     *     *
-     * stack s
-     * s.push(prazdna mapa)
-     * while stack.notEmpty?
-     *  x = stack.pop()
-     *  for all brick_shapes    // state je nafitovana brick
-     *    if fitable_for? x
-     *      state = fit(brick)
-     *      stack.push(state)
-     *
-     *
-     *
-     * s = stack
-     * s.push(map)
-     * while s not empty
-     *  for index=1..n
-     *      stav = s.pop
-     *      for brick = brick1..brick-n     *
-     *          funkce(stav, index, brick)
-
-     * fn1
-     *  while neco na zasobniku
-     *   mapZeStacku = peek ze stacku
-     *
-     *   fit1()
-     *   fit2()
-     *   fit3()
-     *   ....
-     *   odeber ze stacku
-     * */
-
-/*
-    for (i = 0; i < WIDTH * HEIGHT; i++) {
-
-        fitSquare();
-        fitEl();
-        //...
-    }*/
-
     return 0;
 }
 
-void branchFrom(State state, char map[][], int index) {
+int branchFrom(State state, char * map[][], int index) {
+    int x = index / WIDTH - 1;
+    int y = index % WIDTH - 1;
+    Rotation rotation;
+    int rotationWidth;
+
+    for (rotation = EL1; rotation <= STICK2; rotation++) {
+        /* Will it fit? */
+        if (fit(rotation, map, index, 0)) {
+            rotationWidth = getRotationWidth(rotation);
+            /* Create new state */
+            State * newState; // TODO = (State) malloc(sizeof(State));
+            newState->index = index + rotationWidth;
+            newState->rotation = rotation;
+            /* Shut it up to stack */
+            pushToStack(newState);
+        }
+    }
+
+    /* Add new state with index + 1 and no rotation */
+    if (index + 1 < INDEX_MAX) {
+        /* Create new state */
+        State * newState; // TODO = (State) malloc(sizeof(State));
+        newState->index = index + 1;
+        /* Shut it up to stack */
+        pushToStack(newState);
+    }
+}
+int getRotationWidth(Rotation rotation) {
+    switch (rotation) {
+        case EL1:
+        case EL2:
+        case EL3:
+        case EL4:
+            return 5;
+        /* TODO case all remaining rotations */
+    }
+}
+
+int fit(Rotation rotation, char * map[][], int index, int forReal) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
-    canFit
-
+    switch(rotation) {
+        case EL1:
+            if (forReal) {
+                *map[x+3][y]   = EL1; /*        */
+                *map[x][y+1]   = EL1; /*     #  */
+                *map[x+1][y+1] = EL1; /*  ####  */
+                *map[x+2][y+1] = EL1; /*        */
+                *map[x+3][y+1] = EL1; /*        */
+                return 0; // whatever
+            } else {
+                return x + 3 < WIDTH && y + 1 < HEIGHT
+                        && *map[x][y] == 0     && *map[x+1][y] == 0
+                        && *map[x+1][y] == 0   && *map[x+2][y] == 0
+                        && *map[x+3][y] == 0   && *map[x][y+1] == 0
+                        && *map[x+1][y+1] == 0 && *map[x+2][y+1] == 0
+                        && *map[x+3][y+1];
+            }
+        /* TODO case all remaining rotations */
+        /* In case of initial state where rotation is 0 do nothing */
+        default:
+            return 0;
+    }
 }
 int isLeaf(State state) {
 
