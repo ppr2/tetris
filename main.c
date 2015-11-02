@@ -61,7 +61,7 @@ int main() {
     return 0;
 }
 
-int branchFrom(State state, char * map[][], int index) {
+int branchFrom(State * state, char * map[][], int index) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
     int hasBranched = 0;
@@ -95,41 +95,63 @@ int getRotationWidth(Shape shape) {
     }
 }
 
-int fit(Shape shape, char * map[][], int index, int forReal) {
+/*
+ * return 0 if it doesn't fit
+ * */
+int fitable(Shape shape, char * map[][], int index) {
     int x = index / WIDTH - 1;
     int y = index % WIDTH - 1;
 
     switch(shape) {
+        case EMPTY:
+            return index + 1 < INDEX_MAX;
+        case SQUARE:
+            return x + 2 < WIDTH && y + 1 < HEIGHT
+                   && *map[x][y] == 0   && *map[x+1][y] == 0
+                   && *map[x][y+1] == 0 && *map[x+1][y+1] == 0;
         case EL1:
-            if (forReal) {
-                *map[x+3][y]   = EL1; /*        */
-                *map[x][y+1]   = EL1; /*     #  */
-                *map[x+1][y+1] = EL1; /*  ####  */
-                *map[x+2][y+1] = EL1; /*        */
-                *map[x+3][y+1] = EL1; /*        */
-                return 0; // whatever
-            } else {
-                return x + 3 < WIDTH && y + 1 < HEIGHT
-                        && *map[x][y] == 0     && *map[x+1][y] == 0
-                        && *map[x+1][y] == 0   && *map[x+2][y] == 0
-                        && *map[x+3][y] == 0   && *map[x][y+1] == 0
-                        && *map[x+1][y+1] == 0 && *map[x+2][y+1] == 0
-                        && *map[x+3][y+1];
-            }
-        /* TODO case all remaining shapes */
-        /* In case of initial state where shape is EMPTY do nothing */
-        default:
-            return 0;
+            return x + 3 < WIDTH && y + 1 < HEIGHT
+                   && *map[x][y] == 0     && *map[x+1][y] == 0
+                   && *map[x+1][y] == 0   && *map[x+2][y] == 0
+                   && *map[x+3][y] == 0   && *map[x][y+1] == 0
+                   && *map[x+1][y+1] == 0 && *map[x+2][y+1] == 0
+                   && *map[x+3][y+1];
     }
 }
-int isLeaf(State state) {
 
+int fit(Shape shape, char * map[][], int index) {
+    int x = index / WIDTH - 1;
+    int y = index % WIDTH - 1;
+
+    switch(shape) {
+        case EMPTY:
+            break;
+        case SQUARE:
+            *map[x][y]     = SQUARE;
+            *map[x+1][y]   = SQUARE;
+            *map[x][y+1]   = SQUARE;
+            *map[x+1][y+1] = SQUARE;
+            break;
+        case EL1:
+            *map[x+3][y]   = EL1; /*        */
+            *map[x][y+1]   = EL1; /*     #  */
+            *map[x+1][y+1] = EL1; /*  ####  */
+            *map[x+2][y+1] = EL1; /*        */
+            *map[x+3][y+1] = EL1; /*        */
+            break;
+        /* TODO case all remaining shapes */
+    }
+}
+/* Add tree cuting logic here */
+// TODO can be inline function?
+int isLeaf(State * state) {
+    return state->index + 1 >= INDEX_MAX;
 }
 void storeBestScore() {
 
 }
-void deleteLastOperation() {
-
+void unFit(State * state, char * map[]) {
+    // TODO subtract index
 }
 
 /*
