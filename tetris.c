@@ -1,18 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "main.h"
+#include "tetris.h"
 #include "state.h"
 #include "stack.h"
+#include "fitting.h"
 
-#define WIDTH 5
-#define HEIGHT 5
-#define OP_ARR_LENGTH (WIDTH * HEIGHT) / 2
-#define INDEX_MAX WIDTH * HEIGHT
 
 
 /************************************************
  * GLOBAL VARIABLES
  ************************************************/
+#define _DEBUG 0
+#define _WIDTH 5
+#define _HEIGHT 5
+#define _INDEX_MAX _WIDTH * _HEIGHT
+const int WIDTH = _WIDTH;
+const int HEIGHT = _HEIGHT;
+const int DEBUG = _DEBUG;
+const int INDEX_MAX = _INDEX_MAX;
 char map[WIDTH][HEIGHT] = {0};
 
 int main() {
@@ -64,56 +69,6 @@ void branchFrom(State * state) {
     }
 }
 
-/*
- * return 0 if it doesn't fit
- * */
-int fitable(Shape shape, int index) {
-    int x = index / WIDTH - 1;
-    int y = index % WIDTH - 1;
-
-    switch(shape) {
-        case EMPTY:
-            return index + 1 < INDEX_MAX;
-        case SQUARE:
-            return x + 2 < WIDTH && y + 1 < HEIGHT
-                   && map[x][y] == 0   && map[x+1][y] == 0
-                   && map[x][y+1] == 0 && map[x+1][y+1] == 0;
-        case EL1:
-            return x + 3 < WIDTH && y + 1 < HEIGHT
-                   && map[x][y] == 0     && map[x+1][y] == 0
-                   && map[x+1][y] == 0   && map[x+2][y] == 0
-                   && map[x+3][y] == 0   && map[x][y+1] == 0
-                   && map[x+1][y+1] == 0 && map[x+2][y+1] == 0
-                   && map[x+3][y+1];
-    }
-}
-/*
- * Used to fit or unfit, depends on index and newValue.
- * Replace shape - shapeToFit - at index - index - with shape - newValue
- * */
-void fit(Shape shapeToFit, int index, Shape newValue) {
-    int x = index / WIDTH - 1;
-    int y = index % WIDTH - 1;
-
-    switch(shapeToFit) {
-        case EMPTY:
-            break;
-        case SQUARE:
-            map[x][y]     = newValue;
-            map[x+1][y]   = newValue;
-            map[x][y+1]   = newValue;
-            map[x+1][y+1] = newValue;
-            break;
-        case EL1:
-            map[x+3][y]   = newValue; /*        */
-            map[x][y+1]   = newValue; /*     #  */
-            map[x+1][y+1] = newValue; /*  ####  */
-            map[x+2][y+1] = newValue; /*        */
-            map[x+3][y+1] = newValue; /*        */
-            break;
-        /* TODO case all remaining shapes */
-    }
-}
 /* Add tree cuting logic here */
 // TODO can be inline function?
 int isLeaf(State * state) {
@@ -122,6 +77,7 @@ int isLeaf(State * state) {
 void storeBestScore() {
  // TODO
 }
+
 
 /*
 

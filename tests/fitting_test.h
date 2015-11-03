@@ -1,0 +1,4 @@
+#ifndef TETRIS_FITTING_TEST_H
+#define TETRIS_FITTING_TEST_H
+
+#endif //TETRIS_FIT_TEST_H

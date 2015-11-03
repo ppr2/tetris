@@ -8,6 +8,14 @@
  * ------------------------------------------
  * ------------------------------------------
  * --                  --                  --
+ * --   EMPTY is 1x1   --   ##   SQUARE    --
+ * --   blank field    --   ##             --
+ * --                  --                  --
+ * --                  --                  --
+ * --                  --                  --
+ * ------------------------------------------
+ * ------------------------------------------
+ * --                  --                  --
  * --      #   EL1     --   #      EL2     --
  * --   ####           --   ####           --
  * --                  --                  --
@@ -66,15 +74,14 @@ typedef enum {
     STICK1, STICK2
 } Shape;
 
-int shapeWidths[] = {1, 2, 4, 4, 4, 4, 2, 2, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 1, 4};
 
 typedef struct{
     int index;
     Shape shape;
 } State;
 
-State* newState(int index, Shape shape);
 
+State* newState(int index, Shape shape);
 void freeState(State state);
 
 
