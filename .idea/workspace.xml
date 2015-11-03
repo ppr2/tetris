@@ -13,18 +13,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="de1ac4ac-d7ef-43d7-b3fd-58d1d8553c50" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Makefile" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fitting.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fitting.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/fitting_test.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/fitting_test.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tetris.c" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/main.c" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/main.h" afterPath="$PROJECT_DIR$/tetris.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/ppr2-tetris.iml" afterPath="$PROJECT_DIR$/.idea/ppr2-tetris.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/state.c" afterPath="$PROJECT_DIR$/state.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fitting.c" afterPath="$PROJECT_DIR$/fitting.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/fitting_test.c" afterPath="$PROJECT_DIR$/tests/fitting_test.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/state.h" afterPath="$PROJECT_DIR$/state.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tetris.c" afterPath="$PROJECT_DIR$/tetris.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="ppr2-tetris.iws" />
@@ -48,11 +40,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf>
-          <file leaf-file-name="fitting.c" pinned="false" current-in-tab="false">
+          <file leaf-file-name="fitting.c" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/fitting.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="33" column="55" selection-start-line="33" selection-start-column="55" selection-end-line="35" selection-end-column="30" />
+                <state vertical-scroll-proportion="0.21176471">
+                  <caret line="7" column="72" selection-start-line="7" selection-start-column="72" selection-end-line="7" selection-end-column="72" />
                   <folding />
                 </state>
               </provider>
@@ -63,16 +55,6 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
                   <caret line="11" column="31" selection-start-line="11" selection-start-column="31" selection-end-line="11" selection-end-column="31" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="fitting_test.c" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/tests/fitting_test.c">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.53642386">
-                  <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
                   <folding />
                 </state>
               </provider>
@@ -102,21 +84,31 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="tetris.c" pinned="false" current-in-tab="false">
+          <file leaf-file-name="tetris.c" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/tetris.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="15" column="29" selection-start-line="15" selection-start-column="29" selection-end-line="15" selection-end-column="29" />
+                <state vertical-scroll-proportion="0.15294118">
+                  <caret line="43" column="41" selection-start-line="43" selection-start-column="41" selection-end-line="43" selection-end-column="41" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="state.h" pinned="false" current-in-tab="true">
+          <file leaf-file-name="state.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/state.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="2.2649007">
-                  <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+                <state vertical-scroll-proportion="0.0">
+                  <caret line="77" column="34" selection-start-line="77" selection-start-column="34" selection-end-line="77" selection-end-column="34" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="fitting_test.c" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/tests/fitting_test.c">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0">
+                  <caret line="21" column="44" selection-start-line="21" selection-start-column="44" selection-end-line="21" selection-end-column="44" />
                   <folding />
                 </state>
               </provider>
@@ -143,12 +135,12 @@
         <option value="$PROJECT_DIR$/fitting_test.c" />
         <option value="$PROJECT_DIR$/tetris.h" />
         <option value="$PROJECT_DIR$/global_variables.h" />
-        <option value="$PROJECT_DIR$/tetris.c" />
         <option value="$PROJECT_DIR$/fitting.h" />
-        <option value="$PROJECT_DIR$/state.h" />
         <option value="$PROJECT_DIR$/state.c" />
-        <option value="$PROJECT_DIR$/fitting.c" />
         <option value="$PROJECT_DIR$/tests/fitting_test.c" />
+        <option value="$PROJECT_DIR$/state.h" />
+        <option value="$PROJECT_DIR$/tetris.c" />
+        <option value="$PROJECT_DIR$/fitting.c" />
       </list>
     </option>
   </component>
@@ -337,7 +329,13 @@
       <option name="project" value="LOCAL" />
       <updated>1446486918575</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Merge branch 'master' of https://github.com/ppr2/tetris&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;&#10;make fitting_test &amp;&amp; ./fitting_test funguje, ale to je asi tak vsechno">
+      <created>1446560143852</created>
+      <option name="number" value="00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1446560143852</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -346,17 +344,17 @@
     <layout>
       <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13820156" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942432" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32780084" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32987553" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32987553" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32987553" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32943678" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32943678" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33900106" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942432" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -382,7 +380,8 @@
     <MESSAGE value="stack add methods" />
     <MESSAGE value="pushík" />
     <MESSAGE value="Merge branch 'master' of https://github.com/ppr2/tetris&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge branch 'master' of https://github.com/ppr2/tetris&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;" />
+    <MESSAGE value="Merge branch 'master' of https://github.com/ppr2/tetris&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;&#10;make fitting_test &amp;&amp; ./fitting_test funguje, ale to je asi tak vsechno" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge branch 'master' of https://github.com/ppr2/tetris&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;&#10;make fitting_test &amp;&amp; ./fitting_test funguje, ale to je asi tak vsechno" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -695,30 +694,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tetris.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="15" column="29" selection-start-line="15" selection-start-column="29" selection-end-line="15" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/state.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="5" column="6" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/state.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.2649007">
-          <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/fitting_test.h">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -735,18 +710,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fitting.c">
+    <entry file="file://$PROJECT_DIR$/tests/fitting_test.c">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="33" column="55" selection-start-line="33" selection-start-column="55" selection-end-line="35" selection-end-column="30" />
+          <caret line="21" column="44" selection-start-line="21" selection-start-column="44" selection-end-line="21" selection-end-column="44" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/fitting_test.c">
+    <entry file="file://$PROJECT_DIR$/state.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.53642386">
-          <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="5" column="6" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/state.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="77" column="34" selection-start-line="77" selection-start-column="34" selection-end-line="77" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tetris.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.15294118">
+          <caret line="43" column="41" selection-start-line="43" selection-start-column="41" selection-end-line="43" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fitting.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.21176471">
+          <caret line="7" column="72" selection-start-line="7" selection-start-column="72" selection-end-line="7" selection-end-column="72" />
           <folding />
         </state>
       </provider>

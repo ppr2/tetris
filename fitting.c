@@ -4,16 +4,21 @@
 
 
 /*
- * return 0 if it doesn't fit
+ * return 0 if space for shape starting at index is not enough
+ * TODO verify conditions x < WIDTH and y < HEIGHT and the whole process
  * */
 int fitable(Shape shape, int index) {
-    int x = index / WIDTH - 1;
-    int y = index % WIDTH - 1;
+    int x = index % WIDTH;
+    int y = index / WIDTH;
+    int plusX, plusY;
 
     switch(shape) {
         case EMPTY:
-            return index + 1 < INDEX_MAX;
+            printf("x=%d y=%d\n", x, y);
+            printf("%d\n", map[x][y]);
+            return index + 1 < INDEX_MAX && map[x][y] == 0;
         case SQUARE:
+            printf("map[x][y] == 0 ? %d\n", map[x][y] == 0);
             return x + 2 < WIDTH && y + 1 < HEIGHT
                    && map[x][y] == 0   && map[x+1][y] == 0
                    && map[x][y+1] == 0 && map[x+1][y+1] == 0;
@@ -24,7 +29,104 @@ int fitable(Shape shape, int index) {
                    && map[x+3][y] == 0   && map[x][y+1] == 0
                    && map[x+1][y+1] == 0 && map[x+2][y+1] == 0
                    && map[x+3][y+1];
-            // TODO
+        case SQUARE:
+            return x + 1 < WIDTH && y + 1 < HEIGHT
+                    && map[x][y] == 0                 /*        */
+                    && map[x+1][y]   == 0         /*   ##   */
+                    && map[x][y+1]   == 0         /*   ##   */
+                    && map[x+1][y+1] == 0;        /*        */
+        case EL1:
+        case EL2:
+            plusX = shapeToFit == EL1 ? 3 : 0;
+            return  x + 3 < WIDTH && y + 1 < HEIGHT
+                    && map[x+plusX][y] == 0       /*     #  EL1 */
+                    && map[x][y+1]     == 0       /*  ####      */
+                    && map[x+1][y+1]   == 0
+                    && map[x+2][y+1]   == 0       /*  #     EL2 */
+                    && map[x+3][y+1]   == 0;      /*  ####      */
+        case EL3:
+        case EL4:
+            plusX = shapeToFit == EL3 ? 3 : 0;
+            return x + 3 < WIDTH && y + 1 < HEIGHT
+                    && map[x+plusX][y+1] == 0     /*  ####  EL3 */
+                    && map[x][y]         == 0     /*     #      */
+                    && map[x+1][y]       == 0
+                    && map[x+2][y]       == 0     /*  ####  EL4 */
+                    && map[x+3][y]       == 0;    /*  #         */
+        case EL5:
+        case EL6:
+            plusX = shapeToFit == EL5 ? 1 : 0;
+            return x + 1 < WIDTH && y + 3 < HEIGHT
+                    && map[x+plusX][y]   == 0     /*  # EL5  #  EL6 */
+                    && map[x+plusX][y+1] == 0     /*  #      #      */
+                    && map[x+plusX][y+2] == 0     /*  #      #      */
+                    && map[x][y+3]       == 0     /* ##      ##     */
+                    && map[x+1][y+3]     == 0;
+        case EL7:
+        case EL8:
+            plusX = shapeToFit == EL7 ? 1 : 0;
+            return x + 1 < WIDTH && y + 3 < HEIGHT
+                    && map[x][y]         == 0     /* ##      ##     */
+                    && map[x+1][y]       == 0     /*  #      #      */
+                    && map[x+plusX][y+1] == 0     /*  #      #      */
+                    && map[x+plusX][y+2] == 0     /*  # EL7  # EL8  */
+                    && map[x+plusX][y+3] == 0;
+        case STAIRS1:
+            return x + 2 < WIDTH && y + 1 < HEIGHT
+                    && map[x+1][y]   == 0         /*  ## */
+                    && map[x+2][y]   == 0         /* ##  */
+                    && map[x][y+1]   == 0
+                    && map[x+1][y+1] == 0;
+        case STAIRS2:
+            return x + 2 < WIDTH && y + 1 < HEIGHT
+                    && map[x][y]     == 0         /* ##  */
+                    && map[x+1][y]   == 0         /*  ## */
+                    && map[x+1][y+1] == 0
+                    && map[x+2][y+1] == 0;
+        case STAIRS3:
+            return x + 1 < WIDTH && y +2 < HEIGHT
+                    && map[x][y]     == 0         /* #  */
+                    && map[x][y+1]   == 0         /* ## */
+                    && map[x+1][y+1] == 0         /*  # */
+                    && map[x+1][y+2] == 0;
+        case STAIRS4:
+            return x + 1 < WIDTH && y + 2 < HEIGHT
+                    && map[x+1][y]     == 0       /*  # */
+                    && map[x+1][y+1]   == 0       /* ## */
+                    && map[x][y+1]     == 0       /* #  */
+                    && map[x][y+2]     == 0;
+        case TRIANGLE1:
+        case TRIANGLE2:
+            plusY = shapeToFit == TRIANGLE1 ? 1 : 0;
+            return x + 2 < WIDTH && y + 1 < HEIGHT
+                    && map[x+1][y]       == 0     /*  # TRIANGLE1   */
+                    && map[x+1][y+1]     == 0     /* ###            */
+                    && map[x][y+plusY]   == 0     /*            ### */
+                    && map[x+2][y+plusY] == 0;    /*   TRIANGLE2 #  */
+        case TRIANGLE3:
+        case TRIANGLE4:
+            plusX = shapeToFit == TRIANGLE3 ? 0 : 1;
+            return x + 1 < WIDTH && y + 2 < HEIGHT
+                    && map[x][y+1]       == 0     /* # TRIANGLE3     */
+                    && map[x+1][y+1]     == 0     /* ##            # */
+                    && map[x+plusX][y]   == 0     /* #            ## */
+                    && map[x+plusX][y+2] == 0;    /*     TRIANGLE4 # */
+        case STICK1:
+            return x < WIDTH && y + 3 < HEIGHT
+                    && map[x][y]   == 0           /*  #    */
+                    && map[x][y+1] == 0           /*  #    */
+                    && map[x][y+2] == 0           /*  #    */
+                    && map[x][y+3] == 0;          /*  #    */
+        case STICK2:
+            return x + 3 < WIDTH && y < HEIGHT
+                    && map[x][y]   == 0           /*       */
+                    && map[x+1][y] == 0           /* ####  */
+                    && map[x+2][y] == 0           /*       */
+                    && map[x+3][y] == 0;          /*       */
+        default:
+            fprintf(stderr, "INVALID SHAPE TO VERIFY FITTABILITY! shapeToFit=%d, index=%d, newValue=%d",
+                    shapeToFit, index, newValue);
+            break;
     }
 }
 /*
@@ -32,8 +134,8 @@ int fitable(Shape shape, int index) {
  * Replace shape - shapeToFit - at index - index - with shape - newValue
  * */
 void fit(Shape shapeToFit, int index, Shape newValue) {
-    int x = index / WIDTH - 1;
-    int y = index % WIDTH - 1;
+    int x = index % WIDTH;
+    int y = index / WIDTH;
     int plusX, plusY;
 
     switch(shapeToFit) {
@@ -151,7 +253,7 @@ void printMap() {
     printf("\n");
     for (y = 0; y < HEIGHT; y++) {
         for (x = 0; x < WIDTH; x++) {
-            printf("|%.2d|", map[x][y]);
+            printf(map[x][y] > 9 ? "|%d|" : "| %d|", map[x][y]);
         }
         printf("\n");
     }

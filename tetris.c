@@ -35,15 +35,18 @@ int main() {
          */
         fit(currentNode->value->shape, currentNode->value->index, currentNode->value->shape);
         if (currentNode->popped || isLeaf(currentNode->value)) {
-            removeFromStack();
 
             /* Unfit: replace current shape at old index with empty */
-            oldIndex = currentNode->value->index - shapeWidths[currentNode->value->shape];
-            fit(currentNode->value->shape, oldIndex, EMPTY);
+            // TODO remove stuff bellow? I think we should!
+            // oldIndex = currentNode->value->index - shapeWidths[currentNode->value->shape];
+            fit(currentNode->value->shape, currentNode->value->index, EMPTY);
 
-            if (isLeaf(currentState)) {
+            if (isLeaf(currentNode->value)) {
                 storeBestScore();
             }
+            /* Remove must be here since we are removing space allocated for currentNode
+             * hence we can not use it afterwards */
+            removeFromStack();
         } else {
             branchFrom(currentState);
             currentState->branched = 1;
@@ -55,14 +58,13 @@ int main() {
 }
 
 void branchFrom(State * state) {
-    int x = state->index / WIDTH - 1;
-    int y = state->index % WIDTH - 1;
     int hasBranched = 0;
     Shape shape;
 
     for (shape = EMPTY; shape <= STICK2; shape++) {
         /* Will it fit? */
         if (fitable(shape, state->index)) {
+            // New index is next free field in map
             State * createdState = newState(state->index + shapeWidths[shape], shape);
             pushToStack(createdState);
         }
@@ -77,77 +79,3 @@ int isLeaf(State * state) {
 void storeBestScore() {
  // TODO
 }
-
-
-/*
-
-
-*/
-/*
- * index je modulo sirka mapy
- *
- *
- * *//*
-
-state * fit(struct current, shape brickType) {
-    // for all bricks
-    switch(brickType) {
-        case SQUARE:
-            if () {
-                new = fitSquare
-                new.map = ;// COPY of curren.
-                return new;// nafituj vsechny konfigurace
-            }
-            break;
-        case EL:
-            break;
-        case STAIRS:
-            break;
-        case TRIANGLE:
-            break;
-        case STICK:
-            break;
-    }
-    return NULL;
-}
-
-state * fitSquare(struct state current, shape brickType) {
-    if (1) {
-        state new;
-        new.index = current.index + 1;
-        map
-        new.brickCounts = //COpy of current.brickCounts
-                    new.brickCounts[0] += 1;
-        return &new;
-    }
-    // pro vsechny konfigurace
-    // hod na zasobnik novou mapu, pokud tam jde nafitovat
-    jdeNafitovat?
-    jo: naser to do new; return 1;
-    ne: return NULL;
-    stack.push(zkopirovany/pole);
-
-
-}
-
-*/
-/*
- * fit1()
- *  if possible
- *   hod novy na stack
- *   fn1()
- * *//*
-
-
-struct State {
-    char index;
-    char map[][];
-    char brickCounts[];
-};
-typedef struct node {
-    struct state;
-    struct node * next;
-} node_t;
-
-node_t * head = malloc(sizeof(node_t));
-*/

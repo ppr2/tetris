@@ -74,10 +74,15 @@ typedef enum {
     STICK1, STICK2
 } Shape;
 
-
+/*
+ * e.g. for map[3][3]: index = 0, shape = SQUARE
+ * | 1|| 1|| 0|
+ * | 1|| 1|| 0|
+ * | 0|| 0|| 0|
+ * */
 typedef struct{
-    int index;
-    Shape shape;
+    int index;   // Index of top left corner where shape is placed
+    Shape shape; // Shape placed at index
 } State;
 
 
