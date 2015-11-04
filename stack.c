@@ -4,41 +4,44 @@
 
 #define NULL_NODE (Node *)0
 
-int size = 0;
+extern int size = 0;
 
-Node *stackTop = NULL_NODE;
-Node *stackBottom = NULL_NODE;
+extern Node *stackTop = NULL_NODE;
+extern Node *stackBottom = NULL_NODE;
 
-State *stackPeek(void){
-    return stackTop->value;
-}
-
-State *stackPop(void){
-    if(stackSize() <= 0){ return (State *)0; }
-
-    if(stackTop->popped){
-        Node *previous = stackTop->previous;
-        freeState(*(stackTop->value));
-        deleteNode(stackTop);
-        stackTop = previous;
-        if(stackTop != NULL_NODE){
-            stackTop->next = NULL_NODE;
-        }
-        size--;
-        return stackPop();
+void stackPrintOut(void){
+    if(isStackEmpty()){printf("\nStack is empty.\n"); return;}
+    Node *node = stackBottom;
+    printf("--- Stack bottom\n");
+    while(node != NULL_NODE){
+        printf("isBranched - %d, index - %d, shape - %d\n", node->isBranched, node->state->index, node->state->shape);
+        node = node->next;
     }
-
-    State *state = stackTop->value;
-    stackTop->popped = 1;
-
-    return state;
+    printf("--- Stack top\n\n");
 }
 
-State *stackPush(State* state){
-    return stackPushWithPoppedInfo(state, 0);
+Node *stackPeek(void){
+    return stackTop;
 }
 
-State *stackPushWithPoppedInfo(State* currentState, int popped){
+void stackDeleteTop(void){
+    if(stackTop==NULL_NODE){return;}
+    int removedIndex = stackTop->state->index;
+    Node *previous = stackTop->previous;
+    freeNode(stackTop);
+    stackTop = previous;
+    if(stackTop != NULL_NODE){
+        stackTop->next = NULL_NODE;
+    }
+    size--;
+    printf("removed index - %d\n", removedIndex);
+}
+
+State *stackPushState(State* state){
+    return stackPushStateWithPoppedInfo(state, 0);
+}
+
+State *stackPushStateWithPoppedInfo(State* currentState, int isBranched){
     Node *currentNode = (Node *)malloc(sizeof(Node));
     if(currentNode == NULL){printf("Out of memory during push!"); exit(EXIT_FAILURE);}
 
@@ -51,8 +54,8 @@ State *stackPushWithPoppedInfo(State* currentState, int popped){
     }
 
     currentNode->next = NULL_NODE; // je vrchol
-    currentNode->value = currentState;
-    currentNode->popped = popped;
+    currentNode->state = currentState;
+    currentNode->isBranched = isBranched;
 
     stackTop = currentNode;
     size++;
@@ -73,8 +76,8 @@ int isStackEmpty(){
     return (stackSize()==0)?1:0;
 }
 
-void deleteNode(Node *node){
-    free(node->value);
+void freeNode(Node *node){
+    freeState(node->state);
     free(node);
 
     //TODO pred zavolanim zavolat freeState(), aby se smazal i obsah

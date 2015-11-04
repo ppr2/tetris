@@ -87,7 +87,7 @@ typedef struct{
 
 
 State* newState(int index, Shape shape);
-void freeState(State state);
+void freeState(State* state);
 
 
 #endif //TETRIS_STATE_H

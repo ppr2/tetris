@@ -13,6 +13,6 @@ State* newState(int index, Shape shape) {
     return state;
 }
 
-void freeState(State state) {
-    // free(state->neco)
+void freeState(State* state) {
+    free(state);
 }

@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tetris.h"
-#include "state.h"
-#include "stack.h"
-#include "fitting.h"
-
 
 
 /************************************************
@@ -25,31 +21,31 @@ int main() {
 
     Node * currentNode;
     State* currentState;
-    stackPush(newState(0, 0));
+    stackPushState(newState(0, 0));
     int oldIndex;
 
-    while ( ! isStackEmpty()) {
-        currentNode = peekFromStack();
-        /* Fit shape *currentNode->value->shape in map on place currentNode->value->index
-         * and with map values of *currentNode->value->shape
+    while (!isStackEmpty()) {
+        currentNode = stackPeek();
+        currentState = currentNode->state;
+        /* Fit shape *currentState->shape in map on place currentState->index
+         * and with map values of *currentState->shape
          */
-        fit(currentNode->value->shape, currentNode->value->index, currentNode->value->shape);
-        if (currentNode->popped || isLeaf(currentNode->value)) {
-
+        fit(currentState->shape, currentState->index, currentState->shape);
+        if (currentNode->isBranched || isLeaf(currentNode->state)) {
             /* Unfit: replace current shape at old index with empty */
             // TODO remove stuff bellow? I think we should!
             // oldIndex = currentNode->value->index - shapeWidths[currentNode->value->shape];
-            fit(currentNode->value->shape, currentNode->value->index, EMPTY);
+            fit(currentState->shape, currentState->index, EMPTY);
 
-            if (isLeaf(currentNode->value)) {
-                storeBestScore();
+            if (isLeaf(currentNode->state)) {
+                computeScore();
             }
             /* Remove must be here since we are removing space allocated for currentNode
              * hence we can not use it afterwards */
-            removeFromStack();
+            stackDeleteTop();
         } else {
             branchFrom(currentState);
-            currentState->branched = 1;
+            currentNode->isBranched = 1;
         }
         /* Check for other thread's requests here */
     }
@@ -76,6 +72,25 @@ void branchFrom(State * state) {
 int isLeaf(State * state) {
     return state->index + 1 >= INDEX_MAX;
 }
-void storeBestScore() {
- // TODO
+
+void computeScore() {
+    int emptyCount = 0;
+    for(int h=0;h<HEIGHT;h++){
+        for(int w=0;w<WIDTH;w++){
+            if(map[h][w]==EMPTY){emptyCount++;}
+        }
+        printf("\n");
+    }
+    //TODO if (emptyCount<bestEmptyCount && shapeCountsDifference<bestShapeCountsDifference) then
+    // memcpy(map) to bestMap; memcpy(shapeCounts) to bestShapeCounts; bestEmptyCount = emptyCount
+}
+
+void printMap(){
+    for(int h=0;h<HEIGHT;h++){
+        for(int w=0;w<WIDTH;w++){
+            printf("%d,", map[h][w]);
+        }
+        printf("\n");
+    }
+    printf("-------");
 }

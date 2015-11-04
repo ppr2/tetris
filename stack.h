@@ -3,22 +3,24 @@
 
 #include "state.h"
 typedef struct{
-    State *value;
-    int popped;
+    State *state;
+    int isBranched;
     void *previous;
     void *next;
 } Node;
 
+void stackPrintOut(void);
 // Operace na stacku
-State *stackPop(void);
-State *stackPush(State* state);
-State *stackPushWithPoppedInfo(State* state, int popped);
+Node *stackPeek(void);
+void stackDeleteTop(void);
+State *stackPushState(State* state);
+State *stackPushStateWithPoppedInfo(State* state, int isBranched);
 int stackSplit(State **states);
 
 int stackSize(void);
 int isStackEmpty();
 
-void deleteNode(Node *node);
+void freeNode(Node *node);
 
 
 #endif
