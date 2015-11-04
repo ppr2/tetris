@@ -40,8 +40,6 @@ int main() {
             if (isLeaf(currentNode->state)) {
                 computeScore();
             }
-            /* Remove must be here since we are removing space allocated for currentNode
-             * hence we can not use it afterwards */
             stackDeleteTop();
         } else {
             branchFrom(currentState);
@@ -58,11 +56,11 @@ void branchFrom(State * state) {
     Shape shape;
 
     for (shape = EMPTY; shape <= STICK2; shape++) {
-        /* Will it fit? */
+        /* Will it fit? WILL IT BLEND??? That is the question. */
         if (fitable(shape, state->index)) {
             // New index is next free field in map
             State * createdState = newState(state->index + shapeWidths[shape], shape);
-            pushToStack(createdState);
+            stackPushState(createdState);
         }
     }
 }
