@@ -13,7 +13,6 @@
 inline char ** newMap();
 inline void freeMap(char **);
 inline void copyMap(char ** dest, char ** source);
-inline int getEmptyCount();
 inline int isLeaf(State * state);
 void branchFrom(State * state);
 void computeScore();
@@ -25,13 +24,16 @@ void computeScore();
 #define _WIDTH 5
 #define _HEIGHT 5
 #define _INDEX_MAX _WIDTH * _HEIGHT
+
 const int WIDTH = _WIDTH;
 const int HEIGHT = _HEIGHT;
 const int DEBUG = _DEBUG;
 const int INDEX_MAX = _INDEX_MAX;
+
 char ** map;
 char ** bestMap;
 unsigned double bestScore;
+char frequencies[6] = {0};
 
 int main() {
     Node *currentNode;
@@ -42,6 +44,7 @@ int main() {
     while (!isStackEmpty()) {
         currentNode = stackPeek();
         currentState = currentNode->state;
+        frequencies[getSimpleShape(currentState->shape)]++;
         /* Fit shape *currentState->shape in map on place currentState->index
          * and with map values of *currentState->shape
          */
@@ -54,6 +57,7 @@ int main() {
                 computeScore();
             }
             stackDeleteTop();
+            frequencies[getSimpleShape(currentState->shape)]--;
         } else {
             branchFrom(currentState);
             currentNode->isBranched = 1;
@@ -122,24 +126,22 @@ inline int isLeaf(State *state) {
 }
 
 inline int getShapeCountsSum() {
-    char * shapeCounts = (char) calloc(5, 5 * sizeof(char));
+    int i, foo;
+    int sum = 0;
+    int minimum = 32767;
 
-
-    // TODO
-    free(shapeCounts);
-
-}
-/*
- *
- */
-inline int getEmptyCount() {
-    int emptyCount = 0;
-    int h, w;
-    for (h = 0; h < HEIGHT; h++) {
-        for (w = 0; w < WIDTH; w++) {
-            if (map[h][w] == EMPTY) { emptyCount++; }
+    for (i = 0; i < 6; i++) {
+        if (frequencies[i] < minimum) {
+            minimum = frequencies[i];
         }
     }
+
+    for (i = 0; i < 6; i++) {
+        foo = frequencies[i] - minimum;
+        sum += minimum < 0 ? -foo : foo;
+    }
+
+    return sum;
 }
 
 
@@ -147,8 +149,7 @@ inline int getEmptyCount() {
 // C je cetnost zaplneni - shapeCounts
 // Q(a,b) = ( 1 + p/ab ) * ( 1 + Σ|Ci - min (C)| )
 void computeScore() {
-    int p = getEmptyCount();
-    int shapeCountsSum = getShapeCountsSum();
+    int p = frequencies[0];
     unsigned double newScore = (1.0 + p/(WIDTH*HEIGHT)) * (1.0 + getShapeCountsSum());
 
     if (DEBUG) {
