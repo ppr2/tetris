@@ -22,8 +22,8 @@ void computeScore();
  * GLOBAL VARIABLES
  ************************************************/
 #define _DEBUG 0
-#define _WIDTH 15
-#define _HEIGHT 15
+#define _WIDTH 4
+#define _HEIGHT 4
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
 const int WIDTH = _WIDTH;

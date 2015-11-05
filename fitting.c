@@ -7,8 +7,8 @@
  * return 0 if space for shape starting at index is not enough
  * */
 int fitable(Shape shape, int index) {
-    int y = index % HEIGHT;
-    int x = index / HEIGHT;
+    int x = index % WIDTH;
+    int y = index / WIDTH;
     int plusX, plusY;
 
     /* Don't need to check if we are not out of map already
@@ -124,12 +124,12 @@ int fitable(Shape shape, int index) {
 void fit(State * state, Shape newValue) {
     Shape shapeToFit = state->shape;
     int index = state->index;
-    int y = index % HEIGHT;
-    int x = index / HEIGHT;
+    int x = index % WIDTH;
+    int y = index / WIDTH;
     int plusX, plusY;
 
     if (DEBUG) {
-        printf("FITTING! shape=%d at index=%d with newVal=%d\n",
+        //printf("FITTING! shape=%d at index=%d with newVal=%d\n",
                state->shape, state->index, newValue);
         //printf("Map before fitting\n");
         //printMap(map);
@@ -236,7 +236,7 @@ void fit(State * state, Shape newValue) {
             map[x+3][y] = newValue;           /*       */
             break;
         default:
-            fprintf(stderr, "INVALID SHAPE TO FIT! shapeToFit=%d, index=%d, newValue=%d",
+            //fprintf(stderr, "INVALID SHAPE TO FIT! shapeToFit=%d, index=%d, newValue=%d",
                     shapeToFit, index, newValue);
             break;
     }
