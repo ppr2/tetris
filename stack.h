@@ -10,6 +10,7 @@ typedef struct{
 } Node;
 
 void stackPrintOut(void);
+void stackPrintOutCompact(void);
 // Operace na stacku
 Node *stackPeek(void);
 void stackDeleteTop(void);

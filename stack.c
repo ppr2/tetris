@@ -20,13 +20,23 @@ void stackPrintOut(void){
     printf("--- Stack top\n\n");
 }
 
+void stackPrintOutCompact(void){
+    if(isStackEmpty()){printf("\nStack is empty.\n"); return;}
+    printf("---> Stack contents (index,shape)\n");
+    Node *node = stackBottom;
+    while(node != NULL_NODE){
+        printf("(%d,%d),", node->state->index, node->state->shape);
+        node = node->next;
+    }
+    printf(";TOP\n");
+}
+
 Node *stackPeek(void){
     return stackTop;
 }
 
 void stackDeleteTop(void){
     if(stackTop==NULL_NODE){return;}
-    int removedIndex = stackTop->state->index;
     Node *previous = stackTop->previous;
     freeNode(stackTop);
     stackTop = previous;
@@ -34,7 +44,6 @@ void stackDeleteTop(void){
         stackTop->next = NULL_NODE;
     }
     size--;
-    //printf("removed index - %d\n", removedIndex);
 }
 
 State *stackPushState(State* state){

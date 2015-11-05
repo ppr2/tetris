@@ -130,7 +130,7 @@ void fit(State * state, Shape newValue) {
 
     if (DEBUG) {
         //printf("FITTING! shape=%d at index=%d with newVal=%d\n",
-               state->shape, state->index, newValue);
+               //state->shape, state->index, newValue);
         //printf("Map before fitting\n");
         //printMap(map);
     }
@@ -237,7 +237,7 @@ void fit(State * state, Shape newValue) {
             break;
         default:
             //fprintf(stderr, "INVALID SHAPE TO FIT! shapeToFit=%d, index=%d, newValue=%d",
-                    shapeToFit, index, newValue);
+                    //shapeToFit, index, newValue);
             break;
     }
     if (DEBUG) {
