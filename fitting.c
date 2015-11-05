@@ -1,5 +1,4 @@
 #include "fitting.h"
-#include "tetris.h"
 #include "state.h"
 #include <stdio.h>
 
@@ -8,18 +7,16 @@
  * return 0 if space for shape starting at index is not enough
  * */
 int fitable(Shape shape, int index) {
-    int x = index % WIDTH;
-    int y = index / WIDTH;
+    int y = index % HEIGHT;
+    int x = index / HEIGHT;
     int plusX, plusY;
 
     /* Don't need to check if we are not out of map already
      * since isLeaf function is callled before */
 
     switch(shape) {
-        case EMPTY:
-            printf("x=%d y=%d\n", x, y);
-            printf("%d\n", map[x][y]);
-            return index + 1 < INDEX_MAX && map[x][y] == 0;
+        case SPACE:
+            return x < WIDTH && map[x][y] == 0;
         case SQUARE:
             return x + 1 < WIDTH && y + 1 < HEIGHT
                     && map[x][y] == 0             /*        */
@@ -103,7 +100,6 @@ int fitable(Shape shape, int index) {
                     && map[x+plusX][y]   == 0     /* #            ## */
                     && map[x+plusX][y+2] == 0;    /*     TRIANGLE4 # */
         case STICK1:
-            printf("x=%d y=%d", x,y);
             return x < WIDTH && y + 3 < HEIGHT
                     && map[x][y]   == 0           /*  #    */
                     && map[x][y+1] == 0           /*  #    */
@@ -128,17 +124,22 @@ int fitable(Shape shape, int index) {
 void fit(State * state, Shape newValue) {
     Shape shapeToFit = state->shape;
     int index = state->index;
-    int x = index % WIDTH;
-    int y = index / WIDTH;
+    int y = index % HEIGHT;
+    int x = index / HEIGHT;
     int plusX, plusY;
 
     if (DEBUG) {
         printf("FITTING! shape=%d at index=%d with newVal=%d\n",
                state->shape, state->index, newValue);
+        //printf("Map before fitting\n");
+        //printMap(map);
     }
 
     switch(shapeToFit) {
         case EMPTY:
+            break;
+        case SPACE:
+            map[x][y]     = newValue;
             break;
         case SQUARE:
             map[x][y]     = newValue;         /*        */
@@ -223,7 +224,6 @@ void fit(State * state, Shape newValue) {
             map[x+plusX][y+2] = newValue;     /*     TRIANGLE4 # */
             break;
         case STICK1:
-            printf("\nyes\n");
             map[x][y]   = newValue;           /*  #    */
             map[x][y+1] = newValue;           /*  #    */
             map[x][y+2] = newValue;           /*  #    */
@@ -241,11 +241,11 @@ void fit(State * state, Shape newValue) {
             break;
     }
     if (DEBUG) {
-        printf("New shape fitted\n");
-        printMap();
+        //printf("Map after fitting\n");
+        //printMap(map);
     }
 }
-void printMap() {
+void printMap(char ** map) {
     int x,y;
     for (x = 0; x < WIDTH*4; x++) {
         printf("=");

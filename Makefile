@@ -8,7 +8,10 @@ fitting_test: fitting_test.o fitting.o
 stack_test: stack_test.o stack.o state.o
 	gcc -Wall -o stack_test stack_test.o stack.o state.o
 
-# TODO create tetris executable
+all: tetris
+
+tetris: tetris.o fitting.o ${STRUCTURES}
+	gcc -Wall -o tetris tetris.o fitting.o ${STRUCTURES}
 
 tetris.o: tetris.c stack.h state.h fitting.h
 	gcc -c -Wall tetris.c
@@ -19,7 +22,7 @@ fitting_test.o: tests/fitting_test.c tests/fitting_test.h fitting.h
 stack_test.o: tests/stack_test.c tests/stack_test.h stack.h state.h
 	gcc -c -Wall tests/stack_test.c
 
-fitting.o: fitting.c fitting.h tetris.h
+fitting.o: fitting.c fitting.h
 	gcc -c -Wall fitting.c
 
 state.o: state.c state.h

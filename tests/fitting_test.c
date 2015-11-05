@@ -3,10 +3,11 @@
 #include "../state.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define _DEBUG 1
-#define _WIDTH 5
-#define _HEIGHT 5
+#define _WIDTH 3
+#define _HEIGHT 3
 #define _INDEX_MAX _WIDTH * _HEIGHT
 const int WIDTH = _WIDTH;
 const int HEIGHT = _HEIGHT;
@@ -14,46 +15,70 @@ const int DEBUG = _DEBUG;
 const int INDEX_MAX = _INDEX_MAX;
 
 char ** map;
+char ** newMap();
+void freeMap(char **);
+void copyMap(char ** dest, char ** source);
 
 int main() {
-    int x = 0;
-    int y = 0;
-    int index = x + y*WIDTH;
-    initMap();
+    char map_val[3][3] = {
+            {1, 1, 1},
+            {1, 1, 1},
+            {1, 1, 0}
+    };
+    map = newMap();
+/*    for(int i = 0; i < WIDTH; i++) {
+        map[i] = &map_val[i];
+    }*/
 
-    State state;
-    state.index = index;
-    state.shape = STICK2;
-    State * p_state = &state;
-    fit(p_state, EL1);
-    if (fitable(STICK1, 4)) {
-        printf("fitable!\n");
-        state.index = 4;
-        state.shape = STICK1;
-        p_state = &state;
-        fit(p_state, STICK1);
+    int i;
+
+    for (i = 0; i < WIDTH; i++) {
+        memcpy(map[i], map_val[i], HEIGHT);
     }
+    printMap(map);
+    State state;
+    state.index = 8;
+    state.shape = SPACE;
+    printf("fitable? %d\n", fitable(SPACE, 8));
+
+    fit(&state, EL2);
+    printMap(map);
+    /* State * p_state = &state;
+     fit(p_state, EL1);
+     if (fitable(STICK1, 4)) {
+         printf("fitable!\n");
+         state.index = 4;
+         state.shape = STICK1;
+         p_state = &state;
+         fit(p_state, STICK1);
+     }*/
     //printf("fitable? %d\n", fitable(STICK1, 4));
 
-    freeMap();
 
     return 0;
 }
 
-inline void initMap() {
+char ** newMap() {
     int i;
+    char ** newMap;
     // Initialize map
-    map = (char **) calloc(WIDTH, WIDTH * sizeof(char *));
+    newMap = (char **) calloc(WIDTH, WIDTH * sizeof(char *));
     for (i = 0; i < WIDTH; i++) {
-        map[i] = (char *) calloc(HEIGHT, HEIGHT * sizeof(char));
+        newMap[i] = (char *) calloc(HEIGHT, HEIGHT * sizeof(char));
     }
+
+    return newMap;
 }
 
-inline void freeMap() {
+void freeMap(char ** someMap) {
     int i;
 
-    for (i = 0; i < WIDTH; i++){
-        free(map[i]);
+    if (someMap != NULL) {
+        for (i = 0; i < WIDTH; i++){
+            if (someMap[i] != NULL) {
+                free(someMap[i]);
+            }
+        }
+        free(someMap);
     }
-    free(map);
 }

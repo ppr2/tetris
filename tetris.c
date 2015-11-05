@@ -4,25 +4,26 @@
 #include "stack.h"
 #include "fitting.h"
 #include "state.h"
+#include <limits.h>
 
 
 
 /************************************************
  * LOCAL FUNCTIONS
  ************************************************/
-inline char ** newMap();
-inline void freeMap(char **);
-inline void copyMap(char ** dest, char ** source);
-inline int isLeaf(State * state);
-void branchFrom(State * state);
+char ** newMap();
+void freeMap(char **);
+void copyMap(char ** dest, char ** source);
+int isLeaf(State *);
+void branchFrom(State *);
 void computeScore();
 
 /************************************************
  * GLOBAL VARIABLES
  ************************************************/
 #define _DEBUG 0
-#define _WIDTH 5
-#define _HEIGHT 5
+#define _WIDTH 15
+#define _HEIGHT 15
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
 const int WIDTH = _WIDTH;
@@ -31,33 +32,43 @@ const int DEBUG = _DEBUG;
 const int INDEX_MAX = _INDEX_MAX;
 
 char ** map;
+
+/************************************************
+ * LOCAL VARIABLES
+ ************************************************/
 char ** bestMap;
-unsigned double bestScore;
-char frequencies[6] = {0};
+long double bestScore = 9999999;
+char frequencies[7] = {0};
 
 int main() {
     Node *currentNode;
     State *currentState;
-    stackPushState(newState(0, 0));
+    stackPushState(newState(0, EMPTY));
     map = newMap();
 
     while (!isStackEmpty()) {
         currentNode = stackPeek();
         currentState = currentNode->state;
-        frequencies[getSimpleShape(currentState->shape)]++;
+        if ( !currentNode->isBranched) {
+            frequencies[getSimpleShape(currentState->shape)]++;
+        }
         /* Fit shape *currentState->shape in map on place currentState->index
          * and with map values of *currentState->shape
          */
+        if (DEBUG) {
+            stackPrintOut();
+        }
+
         fit(currentState, currentState->shape);
         if (currentNode->isBranched || isLeaf(currentNode->state)) {
             /* Unfit: replace current shape at old index with empty */
-            fit(currentState, EMPTY);
+            fit(currentState, SPACE);
 
             if (isLeaf(currentNode->state)) {
                 computeScore();
             }
-            stackDeleteTop();
             frequencies[getSimpleShape(currentState->shape)]--;
+            stackDeleteTop();
         } else {
             branchFrom(currentState);
             currentNode->isBranched = 1;
@@ -67,12 +78,127 @@ int main() {
         }
         /* Check for other thread's requests here */
     }
+    printf("\n\n\n\n");
+    if (bestMap == NULL) {
+        printf("shit happend\n");
+    } else {
+        printMap(bestMap);
+        printf("SCORE =%Lf\n", bestScore);
+    }
+
     freeMap(map);
+    freeMap(bestMap);
 
     return 0;
 }
 
-inline char ** newMap() {
+void branchFrom(State * state) {
+    Shape shape;
+    int changed = 0;
+    int nextFreeIndex = state->index + shapeWidths[state->shape];
+
+/*    if (nextFreeIndex == INDEX_MAX - 1) {
+        printMap(map);
+        printf("fitable? %d\n", fitable(SPACE, nextFreeIndex));
+        int x = nextFreeIndex % WIDTH;
+        int y = nextFreeIndex / WIDTH;
+        printf("x=%d y=%d %d", x, y, x < WIDTH);
+    }*/
+
+    for (shape = SPACE; shape <= STICK2; shape++) {
+        /* Will it fit? WILL IT BLEND??? That is the question. */
+        if (DEBUG) {
+            printf("trying shape=%d. fitable=%d\n", shape, fitable(shape, state->index));
+        }
+
+        if (fitable(shape, nextFreeIndex)) {
+            // New index is next free field in map
+            State *createdState = newState(nextFreeIndex, shape);
+            stackPushState(createdState);
+            changed = 1;
+        }
+    }
+    if (nextFreeIndex == INDEX_MAX - 1) {
+        printf("changed? %d\n", changed);
+    }
+
+    if (!changed && state->index <= INDEX_MAX) {
+        /*printf("NOT CHANGED MAP\n");
+        printf("fitable? %d at index=%d\n", fitable(SPACE, nextFreeIndex), nextFreeIndex);
+        printMap(map);*/
+        State *createdState = newState(state->index + 1, EMPTY);
+        stackPushState(createdState);
+    }
+}
+
+/* Add tree cuting logic here */
+int isLeaf(State *state) {
+    return state->index >= INDEX_MAX;
+}
+
+int getShapeCountsSum() {
+    int i, foo;
+    int sum = 0;
+    int minimum = INT_MAX;
+
+    printf("FREQUENCIES\n");
+    for (i=0;i<7;i++) printf(" %d", frequencies[i]);
+    printf("\n");
+
+    for (i = 2; i < 7; i++) {
+        if (frequencies[i] < minimum) {
+            minimum = frequencies[i];
+        }
+    }
+    for (i = 2; i < 7; i++) {
+        foo = frequencies[i] - minimum;
+        sum += foo < 0 ? -foo : foo;
+    }
+
+    return sum;
+}
+
+int countEmpty() {
+    int x,y, empties = 0;
+    for (x = 0; x < WIDTH; x++) {
+        for (y = 0; y < HEIGHT; y++) {
+            if (map[x][y] < 2) {
+                empties++;
+            }
+        }
+    }
+
+    return empties;
+}
+
+// p jsou nezaplnena policka
+// C je cetnost zaplneni - shapeCounts
+// Q(a,b) = ( 1 + p/ab ) * ( 1 + Σ|Ci - min (C)| )
+void computeScore() {
+    long double p = countEmpty();
+    printf("counts=%Lf\n, shapes=%d\n", p, getShapeCountsSum());
+    long double newScore = (1.0 + p/(WIDTH*HEIGHT)) * (1.0 + getShapeCountsSum());
+
+    if (DEBUG) {
+        printf("TESTING SCORE: new=%Lf old=%Lf\n", newScore, bestScore);
+    }
+
+    printMap(map);
+    printf("EMPTIES=%Lf NEW_SCORE=%Lf OLD_SCORE=%Lf\n", p, newScore, bestScore);
+
+    if (newScore != 2) {
+        if (newScore < bestScore) {
+            if (bestMap == NULL) {
+                bestMap = newMap();
+            }
+            copyMap(bestMap, map);
+            bestScore = newScore;
+        }
+    }
+}
+
+
+char ** newMap() {
     int i;
     char ** newMap;
     // Initialize map
@@ -84,7 +210,7 @@ inline char ** newMap() {
     return newMap;
 }
 
-inline void freeMap(char ** someMap) {
+void freeMap(char ** someMap) {
     int i;
 
     if (someMap != NULL) {
@@ -97,72 +223,10 @@ inline void freeMap(char ** someMap) {
     }
 }
 
-inline void copyMap(char ** dest, char ** source) {
+void copyMap(char ** dest, char ** source) {
     int i;
 
     for (i = 0; i < WIDTH; i++) {
         memcpy(dest[i], source[i], HEIGHT);
     }
-}
-
-void branchFrom(State *state) {
-    int newIndex;
-    Shape shape;
-
-    for (shape = EMPTY; shape <= STICK2; shape++) {
-        /* Will it fit? WILL IT BLEND??? That is the question. */
-        if (fitable(shape, state->index)) {
-            // New index is next free field in map
-            newIndex = state->index + shapeWidths[shape];
-            State *createdState = newState(newIndex, shape);
-            stackPushState(createdState);
-        }
-    }
-}
-
-/* Add tree cuting logic here */
-inline int isLeaf(State *state) {
-    return state->index + 1 >= INDEX_MAX;
-}
-
-inline int getShapeCountsSum() {
-    int i, foo;
-    int sum = 0;
-    int minimum = 32767;
-
-    for (i = 0; i < 6; i++) {
-        if (frequencies[i] < minimum) {
-            minimum = frequencies[i];
-        }
-    }
-
-    for (i = 0; i < 6; i++) {
-        foo = frequencies[i] - minimum;
-        sum += minimum < 0 ? -foo : foo;
-    }
-
-    return sum;
-}
-
-
-// p jsou nezaplnena policka
-// C je cetnost zaplneni - shapeCounts
-// Q(a,b) = ( 1 + p/ab ) * ( 1 + Σ|Ci - min (C)| )
-void computeScore() {
-    int p = frequencies[0];
-    unsigned double newScore = (1.0 + p/(WIDTH*HEIGHT)) * (1.0 + getShapeCountsSum());
-
-    if (DEBUG) {
-        printf("TESTING SCORE: new=%f old=%f\n", newScore, bestScore);
-    }
-
-    if (newScore > bestScore) {
-        if (bestMap == NULL) {
-            bestMap = newMap();
-        }
-        copyMap(bestMap, map);
-        bestScore = newScore;
-    }
-    //TODO if (emptyCount<bestEmptyCount && shapeCountsDifference<bestShapeCountsDifference) then
-    // memcpy(map) to bestMap; memcpy(shapeCounts) to bestShapeCounts; bestEmptyCount = emptyCount
 }

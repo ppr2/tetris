@@ -34,7 +34,7 @@ void stackDeleteTop(void){
         stackTop->next = NULL_NODE;
     }
     size--;
-    printf("removed index - %d\n", removedIndex);
+    //printf("removed index - %d\n", removedIndex);
 }
 
 State *stackPushState(State* state){

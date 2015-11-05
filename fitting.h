@@ -12,6 +12,6 @@ extern const int shapeWidths[];
 
 int fitable(Shape, int);
 void fit(State *, Shape);
-void printMap();
+void printMap(char ** map);
 
 #endif //TETRIS_FITTING_H
