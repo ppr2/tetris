@@ -1,16 +1,19 @@
 #include "fitting.h"
 #include "tetris.h"
+#include "state.h"
 #include <stdio.h>
 
 
 /*
  * return 0 if space for shape starting at index is not enough
- * TODO verify conditions x < WIDTH and y < HEIGHT and the whole process
  * */
 int fitable(Shape shape, int index) {
     int x = index % WIDTH;
     int y = index / WIDTH;
     int plusX, plusY;
+
+    /* Don't need to check if we are not out of map already
+     * since isLeaf function is callled before */
 
     switch(shape) {
         case EMPTY:
@@ -18,26 +21,14 @@ int fitable(Shape shape, int index) {
             printf("%d\n", map[x][y]);
             return index + 1 < INDEX_MAX && map[x][y] == 0;
         case SQUARE:
-            printf("map[x][y] == 0 ? %d\n", map[x][y] == 0);
-            return x + 2 < WIDTH && y + 1 < HEIGHT
-                   && map[x][y] == 0   && map[x+1][y] == 0
-                   && map[x][y+1] == 0 && map[x+1][y+1] == 0;
-        case EL1:
-            return x + 3 < WIDTH && y + 1 < HEIGHT
-                   && map[x][y] == 0     && map[x+1][y] == 0
-                   && map[x+1][y] == 0   && map[x+2][y] == 0
-                   && map[x+3][y] == 0   && map[x][y+1] == 0
-                   && map[x+1][y+1] == 0 && map[x+2][y+1] == 0
-                   && map[x+3][y+1];
-        case SQUARE:
             return x + 1 < WIDTH && y + 1 < HEIGHT
-                    && map[x][y] == 0                 /*        */
+                    && map[x][y] == 0             /*        */
                     && map[x+1][y]   == 0         /*   ##   */
                     && map[x][y+1]   == 0         /*   ##   */
                     && map[x+1][y+1] == 0;        /*        */
         case EL1:
         case EL2:
-            plusX = shapeToFit == EL1 ? 3 : 0;
+            plusX = shape == EL1 ? 3 : 0;
             return  x + 3 < WIDTH && y + 1 < HEIGHT
                     && map[x+plusX][y] == 0       /*     #  EL1 */
                     && map[x][y+1]     == 0       /*  ####      */
@@ -46,7 +37,7 @@ int fitable(Shape shape, int index) {
                     && map[x+3][y+1]   == 0;      /*  ####      */
         case EL3:
         case EL4:
-            plusX = shapeToFit == EL3 ? 3 : 0;
+            plusX = shape == EL3 ? 3 : 0;
             return x + 3 < WIDTH && y + 1 < HEIGHT
                     && map[x+plusX][y+1] == 0     /*  ####  EL3 */
                     && map[x][y]         == 0     /*     #      */
@@ -55,7 +46,7 @@ int fitable(Shape shape, int index) {
                     && map[x+3][y]       == 0;    /*  #         */
         case EL5:
         case EL6:
-            plusX = shapeToFit == EL5 ? 1 : 0;
+            plusX = shape == EL5 ? 1 : 0;
             return x + 1 < WIDTH && y + 3 < HEIGHT
                     && map[x+plusX][y]   == 0     /*  # EL5  #  EL6 */
                     && map[x+plusX][y+1] == 0     /*  #      #      */
@@ -64,7 +55,7 @@ int fitable(Shape shape, int index) {
                     && map[x+1][y+3]     == 0;
         case EL7:
         case EL8:
-            plusX = shapeToFit == EL7 ? 1 : 0;
+            plusX = shape == EL7 ? 1 : 0;
             return x + 1 < WIDTH && y + 3 < HEIGHT
                     && map[x][y]         == 0     /* ##      ##     */
                     && map[x+1][y]       == 0     /*  #      #      */
@@ -97,7 +88,7 @@ int fitable(Shape shape, int index) {
                     && map[x][y+2]     == 0;
         case TRIANGLE1:
         case TRIANGLE2:
-            plusY = shapeToFit == TRIANGLE1 ? 1 : 0;
+            plusY = shape == TRIANGLE1 ? 1 : 0;
             return x + 2 < WIDTH && y + 1 < HEIGHT
                     && map[x+1][y]       == 0     /*  # TRIANGLE1   */
                     && map[x+1][y+1]     == 0     /* ###            */
@@ -105,13 +96,14 @@ int fitable(Shape shape, int index) {
                     && map[x+2][y+plusY] == 0;    /*   TRIANGLE2 #  */
         case TRIANGLE3:
         case TRIANGLE4:
-            plusX = shapeToFit == TRIANGLE3 ? 0 : 1;
+            plusX = shape == TRIANGLE3 ? 0 : 1;
             return x + 1 < WIDTH && y + 2 < HEIGHT
                     && map[x][y+1]       == 0     /* # TRIANGLE3     */
                     && map[x+1][y+1]     == 0     /* ##            # */
                     && map[x+plusX][y]   == 0     /* #            ## */
                     && map[x+plusX][y+2] == 0;    /*     TRIANGLE4 # */
         case STICK1:
+            printf("x=%d y=%d", x,y);
             return x < WIDTH && y + 3 < HEIGHT
                     && map[x][y]   == 0           /*  #    */
                     && map[x][y+1] == 0           /*  #    */
@@ -124,19 +116,26 @@ int fitable(Shape shape, int index) {
                     && map[x+2][y] == 0           /*       */
                     && map[x+3][y] == 0;          /*       */
         default:
-            fprintf(stderr, "INVALID SHAPE TO VERIFY FITTABILITY! shapeToFit=%d, index=%d, newValue=%d",
-                    shapeToFit, index, newValue);
-            break;
+            fprintf(stderr, "INVALID SHAPE TO VERIFY FITTABILITY! shapeToFit=%d, index=%d",
+                    shape, index);
+            return -1;
     }
 }
 /*
  * Used to fit or unfit, depends on index and newValue.
  * Replace shape - shapeToFit - at index - index - with shape - newValue
  * */
-void fit(Shape shapeToFit, int index, Shape newValue) {
+void fit(State * state, Shape newValue) {
+    Shape shapeToFit = state->shape;
+    int index = state->index;
     int x = index % WIDTH;
     int y = index / WIDTH;
     int plusX, plusY;
+
+    if (DEBUG) {
+        printf("FITTING! shape=%d at index=%d with newVal=%d\n",
+               state->shape, state->index, newValue);
+    }
 
     switch(shapeToFit) {
         case EMPTY:
@@ -224,6 +223,7 @@ void fit(Shape shapeToFit, int index, Shape newValue) {
             map[x+plusX][y+2] = newValue;     /*     TRIANGLE4 # */
             break;
         case STICK1:
+            printf("\nyes\n");
             map[x][y]   = newValue;           /*  #    */
             map[x][y+1] = newValue;           /*  #    */
             map[x][y+2] = newValue;           /*  #    */

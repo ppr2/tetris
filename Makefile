@@ -10,7 +10,7 @@ stack_test: stack_test.o stack.o state.o
 
 # TODO create tetris executable
 
-tetris.o: tetris.c tetris.h stack.h state.h
+tetris.o: tetris.c stack.h state.h fitting.h
 	gcc -c -Wall tetris.c
 
 fitting_test.o: tests/fitting_test.c tests/fitting_test.h fitting.h
