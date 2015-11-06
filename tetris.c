@@ -20,10 +20,10 @@ void computeScore();
 /************************************************
  * GLOBAL VARIABLES
  ************************************************/
-#define _DEBUG 1
+#define _DEBUG 0
 #define _DEBUG_STEPS 0
-#define _WIDTH 3
-#define _HEIGHT 3
+#define _WIDTH 5
+#define _HEIGHT 4
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
 const int WIDTH = _WIDTH;
@@ -72,6 +72,7 @@ int main(int argc, char** argv) {
             currentNode->isBranched = 1;
         }
 
+        printf("STACK SIZE=%d\n", stackSize());
         if (DEBUG && DEBUG_STEPS) {getc(stdin);}
         /* TODO Check for other thread's requests here */
     }

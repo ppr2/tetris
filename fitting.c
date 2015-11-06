@@ -24,14 +24,19 @@ int fitable(Shape shape, int index) {
                     && map[x][y+1]   == 0         /*   ##   */
                     && map[x+1][y+1] == 0;        /*        */
         case EL1:
+            return x - 3 >= 0 && y + 1 < HEIGHT
+                    && map[x][y]     == 0         /*     #  EL1 */
+                    && map[x][y+1]   == 0         /*  ####      */
+                    && map[x-3][y+1] == 0
+                    && map[x-2][y+1] == 0
+                    && map[x-1][y+1] == 0;
         case EL2:
-            plusX = shape == EL1 ? 3 : 0;
             return  x + 3 < WIDTH && y + 1 < HEIGHT
-                    && map[x+plusX][y] == 0       /*     #  EL1 */
+                    && map[x][y]       == 0       /*  #     EL2 */
                     && map[x][y+1]     == 0       /*  ####      */
                     && map[x+1][y+1]   == 0
-                    && map[x+2][y+1]   == 0       /*  #     EL2 */
-                    && map[x+3][y+1]   == 0;      /*  ####      */
+                    && map[x+2][y+1]   == 0
+                    && map[x+3][y+1]   == 0;
         case EL3:
         case EL4:
             plusX = shape == EL3 ? 3 : 0;
@@ -42,13 +47,18 @@ int fitable(Shape shape, int index) {
                     && map[x+2][y]       == 0     /*  ####  EL4 */
                     && map[x+3][y]       == 0;    /*  #         */
         case EL5:
+            return x - 1 >= 0 && y + 3 < HEIGHT
+                   && map[x][y]         == 0      /*   #  EL5   */
+                   && map[x][y+1]       == 0      /*   #        */
+                   && map[x][y+2]       == 0      /*   #        */
+                   && map[x][y+3]       == 0      /*  ##        */
+                   && map[x-1][y+3]     == 0;
         case EL6:
-            plusX = shape == EL5 ? 1 : 0;
             return x + 1 < WIDTH && y + 3 < HEIGHT
-                    && map[x+plusX][y]   == 0     /*  # EL5  #  EL6 */
-                    && map[x+plusX][y+1] == 0     /*  #      #      */
-                    && map[x+plusX][y+2] == 0     /*  #      #      */
-                    && map[x][y+3]       == 0     /* ##      ##     */
+                    && map[x][y]         == 0     /*  #  EL6    */
+                    && map[x][y+1]       == 0     /*  #         */
+                    && map[x][y+2]       == 0     /*  #         */
+                    && map[x][y+3]       == 0     /*  ##        */
                     && map[x+1][y+3]     == 0;
         case EL7:
         case EL8:
@@ -60,11 +70,11 @@ int fitable(Shape shape, int index) {
                     && map[x+plusX][y+2] == 0     /*  # EL7  # EL8  */
                     && map[x+plusX][y+3] == 0;
         case STAIRS1:
-            return x + 2 < WIDTH && y + 1 < HEIGHT
+            return x + 1 < WIDTH && x - 1 >= 0 && y + 1 < HEIGHT
+                    && map[x][y]   == 0
                     && map[x+1][y]   == 0         /*  ## */
-                    && map[x+2][y]   == 0         /* ##  */
-                    && map[x][y+1]   == 0
-                    && map[x+1][y+1] == 0;
+                    && map[x-1][y+1]   == 0         /* ##  */
+                    && map[x][y+1] == 0;
         case STAIRS2:
             return x + 2 < WIDTH && y + 1 < HEIGHT
                     && map[x][y]     == 0         /* ##  */
@@ -78,27 +88,35 @@ int fitable(Shape shape, int index) {
                     && map[x+1][y+1] == 0         /*  # */
                     && map[x+1][y+2] == 0;
         case STAIRS4:
-            return x + 1 < WIDTH && y + 2 < HEIGHT
-                    && map[x+1][y]     == 0       /*  # */
-                    && map[x+1][y+1]   == 0       /* ## */
-                    && map[x][y+1]     == 0       /* #  */
-                    && map[x][y+2]     == 0;
+            return x - 1 >= 0 && x < WIDTH && y + 2 < HEIGHT
+                    && map[x][y]         == 0       /*  # */
+                    && map[x][y+1]       == 0       /* ## */
+                    && map[x-1][y+1]     == 0       /* #  */
+                    && map[x-1][y+2]     == 0;
         case TRIANGLE1:
+            return x - 1 >= 0 && x + 1 < WIDTH && y + 1 < HEIGHT
+                    && map[x][y]         == 0     /*  #             */
+                    && map[x-1][y+1]     == 0     /* ###            */
+                    && map[x][y+1]       == 0     /*     TRIANGLE1  */
+                    && map[x+1][y+1]     == 0;
         case TRIANGLE2:
-            plusY = shape == TRIANGLE1 ? 1 : 0;
             return x + 2 < WIDTH && y + 1 < HEIGHT
-                    && map[x+1][y]       == 0     /*  # TRIANGLE1   */
-                    && map[x+1][y+1]     == 0     /* ###            */
-                    && map[x][y+plusY]   == 0     /*            ### */
-                    && map[x+2][y+plusY] == 0;    /*   TRIANGLE2 #  */
+                    && map[x][y]       == 0     /*    ###         */
+                    && map[x+1][y]     == 0     /*     #          */
+                    && map[x+2][y]     == 0     /*   TRIANGLE2    */
+                    && map[x+1][y+1]   == 0;
         case TRIANGLE3:
-        case TRIANGLE4:
-            plusX = shape == TRIANGLE3 ? 0 : 1;
             return x + 1 < WIDTH && y + 2 < HEIGHT
-                    && map[x][y+1]       == 0     /* # TRIANGLE3     */
-                    && map[x+1][y+1]     == 0     /* ##            # */
-                    && map[x+plusX][y]   == 0     /* #            ## */
-                    && map[x+plusX][y+2] == 0;    /*     TRIANGLE4 # */
+                   && map[x][y+1]       == 0     /* #               */
+                   && map[x+1][y+1]     == 0     /* ##              */
+                   && map[x][y]         == 0     /* #               */
+                   && map[x][y+2]       == 0;    /*    TRIANGLE3    */
+        case TRIANGLE4:
+            return x - 1 >= 0 && x < WIDTH && y + 2 < HEIGHT
+                    && map[x][y]       == 0     /*                 */
+                    && map[x-1][y+1]   == 0     /*  TRIANGLE4   #  */
+                    && map[x][y+1]     == 0     /*             ##  */
+                    && map[x][y+2]     == 0;    /*              #  */
         case STICK1:
             return x < WIDTH && y + 3 < HEIGHT
                     && map[x][y]   == 0           /*  #    */
@@ -148,30 +166,31 @@ void fit(State * state, Shape newValue) {
             map[x+1][y+1] = newValue;         /*        */
             break;
         case EL1:
-        case EL2:
-            plusX = shapeToFit == EL1 ? 3 : 0;
-            map[x+plusX][y] = newValue;       /*     #  EL1 */
-            map[x][y+1]     = newValue;       /*  ####      */
-            map[x+1][y+1]   = newValue;
-            map[x+2][y+1]   = newValue;       /*  #     EL2 */
-            map[x+3][y+1]   = newValue;       /*  ####      */
+            map[x][y]     = newValue;         /*     #  EL1 */
+            map[x][y+1]   = newValue;         /*  ####      */
+            map[x-3][y+1] = newValue;
+            map[x-2][y+1] = newValue;
+            map[x-1][y+1] = newValue;
             break;
-        case EL3:
-        case EL4:
-            plusX = shapeToFit == EL3 ? 3 : 0;
-            map[x+plusX][y+1] = newValue;     /*  ####  EL3 */
-            map[x][y]         = newValue;     /*     #      */
-            map[x+1][y]       = newValue;
-            map[x+2][y]       = newValue;     /*  ####  EL4 */
-            map[x+3][y]       = newValue;     /*  #         */
+        case EL2:
+            map[x][y]       = newValue;      /*  #     EL2 */
+            map[x][y+1]     = newValue;      /*  ####      */
+            map[x+1][y+1]   = newValue;
+            map[x+2][y+1]   = newValue;
+            map[x+3][y+1]   = newValue;
             break;
         case EL5:
+            map[x][y]         = newValue;      /*   #  EL5   */
+            map[x][y+1]       = newValue;      /*   #        */
+            map[x][y+2]       = newValue;      /*   #        */
+            map[x][y+3]       = newValue;      /*  ##        */
+            map[x-1][y+3]     = newValue;
+            break;
         case EL6:
-            plusX = shapeToFit == EL5 ? 1 : 0;
-            map[x+plusX][y]   = newValue;     /*  # EL5  #  EL6 */
-            map[x+plusX][y+1] = newValue;     /*  #      #      */
-            map[x+plusX][y+2] = newValue;     /*  #      #      */
-            map[x][y+3]       = newValue;     /* ##      ##     */
+            map[x][y]         = newValue;     /*  #  EL6    */
+            map[x][y+1]       = newValue;     /*  #         */
+            map[x][y+2]       = newValue;     /*  #         */
+            map[x][y+3]       = newValue;     /*  ##        */
             map[x+1][y+3]     = newValue;
             break;
         case EL7:
@@ -184,10 +203,10 @@ void fit(State * state, Shape newValue) {
             map[x+plusX][y+3] = newValue;
             break;
         case STAIRS1:
-            map[x+1][y]   = newValue;         /*  ## */
-            map[x+2][y]   = newValue;         /* ##  */
-            map[x][y+1]   = newValue;
-            map[x+1][y+1] = newValue;
+            map[x][y]       = newValue;
+            map[x+1][y]     = newValue;        /*  ## */
+            map[x-1][y+1]   = newValue;        /* ##  */
+            map[x][y+1]     = newValue;
             break;
         case STAIRS2:
             map[x][y]     = newValue;         /* ##  */
@@ -202,26 +221,34 @@ void fit(State * state, Shape newValue) {
             map[x+1][y+2] = newValue;
             break;
         case STAIRS4:
-            map[x+1][y]     = newValue;       /*  # */
-            map[x+1][y+1]   = newValue;       /* ## */
-            map[x][y+1]     = newValue;       /* #  */
-            map[x][y+2]     = newValue;
+            map[x][y]        = newValue;      /*  # */
+            map[x][y+1]      = newValue;      /* ## */
+            map[x-1][y+1]    = newValue;      /* #  */
+            map[x-1][y+2]    = newValue;
             break;
         case TRIANGLE1:
+            map[x][y]         = newValue;    /*  #             */
+            map[x-1][y+1]     = newValue;    /* ###            */
+            map[x][y+1]       = newValue;    /*     TRIANGLE1  */
+            map[x+1][y+1]     = newValue;
+            break;
         case TRIANGLE2:
-            plusY = shapeToFit == TRIANGLE1 ? 1 : 0;
-            map[x+1][y]       = newValue;     /*  # TRIANGLE1   */
-            map[x+1][y+1]     = newValue;     /* ###            */
-            map[x][y+plusY]   = newValue;     /*            ### */
-            map[x+2][y+plusY] = newValue;     /*   TRIANGLE2 #  */
+            map[x][y]       = newValue;    /*    ###         */
+            map[x+1][y]     = newValue;    /*     #          */
+            map[x+2][y]     = newValue;    /*   TRIANGLE2    */
+            map[x+1][y+1]   = newValue;
             break;
         case TRIANGLE3:
+            map[x][y+1]       = newValue;    /* #               */
+            map[x+1][y+1]     = newValue;    /* ##              */
+            map[x][y]         = newValue;    /* #               */
+            map[x][y+2]       = newValue;    /*    TRIANGLE3    */
+            break;
         case TRIANGLE4:
-            plusX = shapeToFit == TRIANGLE3 ? 0 : 1;
-            map[x][y+1]       = newValue;     /* # TRIANGLE3     */
-            map[x+1][y+1]     = newValue;     /* ##            # */
-            map[x+plusX][y]   = newValue;     /* #            ## */
-            map[x+plusX][y+2] = newValue;     /*     TRIANGLE4 # */
+            map[x][y]       = newValue;    /*                 */
+            map[x-1][y+1]   = newValue;    /*  TRIANGLE4   #  */
+            map[x][y+1]     = newValue;    /*             ##  */
+            map[x][y+2]     = newValue;    /*              #  */
             break;
         case STICK1:
             map[x][y]   = newValue;           /*  #    */
@@ -253,7 +280,11 @@ void printMap(char ** map) {
     printf("\n");
     for (y = 0; y < HEIGHT; y++) {
         for (x = 0; x < WIDTH; x++) {
-            printf(map[x][y] > 9 ? "|%d|" : "| %d|", map[x][y]);
+            if (map[x][y] < 2) {
+                printf("|  |");
+            } else {
+                printf(map[x][y] > 9 ? "|%d|" : "| %d|", map[x][y]);
+            }
         }
         printf("\n");
     }
