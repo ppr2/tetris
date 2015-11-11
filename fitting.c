@@ -9,7 +9,7 @@
 int fitable(Shape shape, int index) {
     int x = index % WIDTH;
     int y = index / WIDTH;
-    int plusX, plusY;
+    int plusX;
 
     /* Don't need to check if we are not out of map already
      * since isLeaf function is callled before */
@@ -144,7 +144,7 @@ void fit(State * state, Shape newValue) {
     int index = state->index;
     int x = index % WIDTH;
     int y = index / WIDTH;
-    int plusX, plusY;
+    int plusX;
 
     if (DEBUG) {
         //printf("FITTING! shape=%d at index=%d with newVal=%d\n",

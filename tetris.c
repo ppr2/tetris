@@ -26,9 +26,9 @@ void computeScore();
 #define _HEIGHT 4
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
-const int WIDTH = _WIDTH;
-const int HEIGHT = _HEIGHT;
-const int DEBUG = _DEBUG;
+int WIDTH  ;//= _WIDTH;
+int HEIGHT ;//= _HEIGHT;
+int DEBUG  ;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
 const int INDEX_MAX = _INDEX_MAX;
 
@@ -42,6 +42,13 @@ long double bestScore = 9999999;
 char frequencies[7] = {0};
 
 int main(int argc, char** argv) {
+    if (argc < 3 || argc > 4) {
+      fprintf(stderr, "Invalid number of arguments. Call tetris WIDTH HEIGHT [DEBUG]\n");
+      return 1;
+    }
+    WIDTH = atoi(argv[1]);
+    HEIGHT = atoi(argv[2]);
+    DEBUG = argc == 4 ? atoi(argv[3]) : 0;
     /* Init */
     Node *currentNode;
     State *currentState;
@@ -72,7 +79,6 @@ int main(int argc, char** argv) {
             currentNode->isBranched = 1;
         }
 
-        printf("STACK SIZE=%d\n", stackSize());
         if (DEBUG && DEBUG_STEPS) {getc(stdin);}
         /* TODO Check for other thread's requests here */
     }
@@ -82,7 +88,6 @@ int main(int argc, char** argv) {
     if (bestMap == NULL) {
         printf("bestMap is null, it definitely won't blend :(\n");
     } else {
-        int i;
         printMap(bestMap);
         printf("score -> %Lf\n", bestScore);
         printf("\n");
