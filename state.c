@@ -14,6 +14,14 @@ State* newState(int index, Shape shape, int depth) {
     return state;
 }
 
+void getArrayFromState(short *arr, State state, int index, short isBranched){
+    //TODO serialize State to array
+}
+
+State getStateFromArray(short *arr, int *index){
+    //TODO parse State from serialized array
+}
+
 void freeState(State* state) {
     free(state);
 }

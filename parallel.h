@@ -1,0 +1,6 @@
+#ifndef TETRIS_PARALLEL_H
+#define TETRIS_PARALLEL_H
+
+//TODO
+
+#endif //TETRIS_PARALLEL_H
