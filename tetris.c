@@ -40,8 +40,11 @@ char ** map;
 char ** bestMap;
 long double bestScore = 9999999;
 char frequencies[7] = {0};
+int workRequested = 0; // Have  we been asked for work?
 
 int main(int argc, char** argv) {
+    //TODO MPI_Init(&argc, &argv);
+    //TODO initMPI();
     if (argc < 3 || argc > 4) {
       fprintf(stderr, "Invalid number of arguments. Call tetris WIDTH HEIGHT [DEBUG]\n");
       return 1;
@@ -53,12 +56,14 @@ int main(int argc, char** argv) {
     Node *currentNode;
     State *currentState;
     map = newMap();
-    stackPushState(newState(0, EMPTY));
+    stackPushState(newState(0, EMPTY, 0));
 
     /* Main cycle */
     while (!isStackEmpty()) {
         currentNode = stackPeek();
         currentState = currentNode->state;
+
+        /* Process current node */
         if ( !currentNode->isBranched) {
             frequencies[getSimpleShape(currentState->shape)]++;
         }
@@ -80,7 +85,6 @@ int main(int argc, char** argv) {
         }
 
         if (DEBUG && DEBUG_STEPS) {getc(stdin);}
-        /* TODO Check for other thread's requests here */
     }
 
     /* Results output */
@@ -93,8 +97,11 @@ int main(int argc, char** argv) {
         printf("\n");
     }
 
+    /* Free global structures */
     freeMap(map);
     freeMap(bestMap);
+
+    //TODO MPI_Finalize();
 
     return 0;
 }
@@ -114,14 +121,14 @@ void branchFrom(State * state) {
 
         if (fitable(shape, nextFreeIndex)) {
             // New index is next free field in map
-            State *createdState = newState(nextFreeIndex, shape);
+            State *createdState = newState(nextFreeIndex, shape, state->depth+1);
             stackPushState(createdState);
             changed = 1;
         }
     }
 
     if (!changed && nextFreeIndex <= INDEX_MAX) {
-        State *createdState = newState(state->index + 1, EMPTY);
+        State *createdState = newState(state->index + 1, EMPTY, state->depth+1);
         stackPushState(createdState);
     }
 }

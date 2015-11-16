@@ -83,10 +83,11 @@ typedef enum {
 typedef struct{
     int index;   // Index of top left corner where shape is placed
     Shape shape; // Shape placed at index
+    int depth; // Depth on stack
 } State;
 
 
-State* newState(int index, Shape shape);
+State* newState(int index, Shape shape, int depth);
 void freeState(State* state);
 int getSimpleShape(Shape shape);
 

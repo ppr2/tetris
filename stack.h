@@ -16,7 +16,7 @@ Node *stackPeek(void);
 void stackDeleteTop(void);
 State *stackPushState(State* state);
 State *stackPushStateWithPoppedInfo(State* state, int isBranched);
-int stackSplit(State **states);
+int stackSplit(State **states, int half);
 
 int stackSize(void);
 int isStackEmpty();

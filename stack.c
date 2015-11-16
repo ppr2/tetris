@@ -14,7 +14,7 @@ void stackPrintOut(void){
     Node *node = stackBottom;
     printf("--- Stack bottom\n");
     while(node != NULL_NODE){
-        printf("isBranched - %d, index - %d, shape - %d\n", node->isBranched, node->state->index, node->state->shape);
+        printf("depth - %d, isBranched - %d, index - %d, shape - %d\n", node->state->depth, node->isBranched, node->state->index, node->state->shape);
         node = node->next;
     }
     printf("--- Stack top\n\n");
@@ -25,7 +25,7 @@ void stackPrintOutCompact(void){
     printf("---> Stack contents (index,shape)\n");
     Node *node = stackBottom;
     while(node != NULL_NODE){
-        printf("(%d,%d),", node->state->index, node->state->shape);
+        printf("(%d,%d,d%d),", node->state->index, node->state->shape, node->state->depth);
         node = node->next;
     }
     printf(";TOP\n");
@@ -72,9 +72,63 @@ State *stackPushStateWithPoppedInfo(State* currentState, int isBranched){
     return currentState;
 }
 
-int stackSplit(State **states) {
-    //TODO
-    return 1;
+/*
+ * Metoda pro rozdeleni zasobniku D-ADZ (puleni u dna)
+ */
+int stackSplit(State **states, int half) {
+    if(isStackEmpty()){
+        //printf("(%d) Stack is empty.\n", rank);
+        return 0;
+    }
+
+    Node *node = stackBottom;
+    while(node->isBranched){
+        node = node->next;
+        if(node == NULL_NODE){
+            //printf("(%d) Stack contains only branched nodes.\n", rank);
+            return 0;
+        }
+    }
+
+    // Count total number of cuttable nodes
+    int cuttableNodeDepth = node->state->depth;
+    int cuttableNodeCount = 0;
+    do {
+        cuttableNodeCount++;
+        node = node->next;
+    } while(node->state->depth == cuttableNodeDepth && !node->isBranched);
+
+    // Cut in half (+1)
+    int nodesToCutCount = half ? (cuttableNodeCount + 1) / 2 : 1;
+    if (cuttableNodeCount > 0 && nodesToCutCount > 0) {
+        *states = (State *)malloc(nodesToCutCount * sizeof(State));
+        if(*states == NULL){
+            printf("Out of memory during stack cutting!");
+            exit(EXIT_FAILURE);
+        }
+
+        Node *firstUncutNode = node;
+        node = node->previous;
+
+        // Free nodes
+        int i;
+        Node *previous;
+        for (i = 0; i < nodesToCutCount; i++) {
+            (*states)[i] = *node->state;
+            previous = node->previous;
+
+            //TODO free what is to be freed, but allow sending of data
+            freeNode(node);
+            node = previous;
+        }
+        size -= nodesToCutCount; // Reduce stack size counter
+
+        // Repair stack
+        node->next = firstUncutNode;
+        firstUncutNode->previous = node;
+        return nodesToCutCount;
+    }
+    return 0;
 }
 
 int stackSize(void){
@@ -88,6 +142,4 @@ int isStackEmpty(){
 void freeNode(Node *node){
     freeState(node->state);
     free(node);
-
-    //TODO pred zavolanim zavolat freeState(), aby se smazal i obsah
 }

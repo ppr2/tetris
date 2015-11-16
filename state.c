@@ -5,11 +5,12 @@
 
 const int shapeWidths[] = {0, 1, 2, 1, 1, 4, 4, 1, 1, 2, 2, 2, 2, 1, 1, 1, 3, 1, 1, 1, 4};
 
-State* newState(int index, Shape shape) {
+State* newState(int index, Shape shape, int depth) {
     State* state;
     state = (State*)malloc(sizeof(State));
     state->index = index;
     state->shape = shape;
+    state->depth = depth;
     return state;
 }
 
