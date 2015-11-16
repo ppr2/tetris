@@ -42,61 +42,127 @@ long double bestScore = 9999999;
 char frequencies[7] = {0};
 int workRequested = 0; // Have  we been asked for work?
 
+#define MSG_WORK_REQUEST 1000
+#define MSG_WORK_SENT    1001
+#define MSG_WORK_NOWORK  1002
+#define MSG_TOKEN        1003
+#define MSG_FINISH       1004
+
+#define TOKEN_BLACK 1
+#define TOKEN_WHITE 0
+
 int main(int argc, char** argv) {
     //TODO MPI_Init(&argc, &argv);
     //TODO initMPI();
+    //
+
+    int my_rank, p_cnt, p_index, finished, 
+        passes_cnt, msg_arrived, status,
+        work_requested;
+
+    // P0 onlny
+    int token_sent;
+    token_sent = 0;
+
+    MPI_Init( &argc, &argv );
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &p_count);
+
+    // Initialization
+    if (my_rank == 0) {
+      // TODO branch until stack.size < p_count + 1
+      for (int i = 1; i < p_count; i++) {
+        sendWork(stack_part, i); // send part of stack to process i
+      }
+    } else {
+      // TODO blocking wait until MSG_WORK_SENT arrives
+      createStackFromReceived(stuff); // TODO
+    }
+
       
-    p_index = 0;
-    while (status != FINISHED) {
+    p_index = 0;        // index of work giver
+    finished = 0;       // flag whether this process is finished
+    passes_cnt = 0;     // how many loop passes were between MPI queue checking
+    work_requested = 0; // is this process waiting for more work?
+    while (!finished) {
       while (!isStackEmpty()) {
-        // do sequential stuff
-        if (more than 100 passes) {
-          tag = get_mpi_tag
-          switch (tag) {
-            case MSG_WORK_REQUEST:
-              // someone asked for work - send part of stack/NO_WORK
-            case MSG_TOKEN:
-              // P0 asked for token
-              // respond black
-            default:
-              error
+        // TODO do sequential stuff
+        if (passes_cnt > 100) {
+          MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
+          if (msg_arrived) {
+            switch (status.MPI_TAG) {
+              case MSG_WORK_REQUEST:
+                // someone asked for work - send part of stack/NO_WORK
+                if (isStackSplittable()) { // TODO
+                  sendPartOfStack(); // TODO
+                } else {
+                  reply(NO_WORK); // TODO
+                }
+                break;
+              case MSG_TOKEN:
+                // P0 asked for token
+                // respond black
+                reply(TOKEN_BLACK); //TODO
+                break;
+              default:
+                raiseError("Invalid MPI tag: %d\n", status.MPI_TAG); // TODO
+            }
           }
+          passes_cnt = 0;
+        }
+        passes_cnt++;
+      }
+
+      // Is there any process I haven't asked?
+      if (p_index < p_count) {
+        // request work from process p_index
+        if (p_index == my_rank) p_index++;
+        requestWork(p_index); // TODO
+        work_requested = 1;
+      } else {
+        if (my_rank == 0 && !token_sent) {
+          sendToken(); // TODO
+          token_sent = 1;
         }
       }
 
-      if (hasnt asked everybody yet) {
-        requestWork(p_index); // one processor at time
-      } else {
-        if ( my_rank == 0 ) {
-          if (token hasn't been sent) {
-            sendToken() 
-          }
-        }
-      }
-      switch (get_mpi_tag) {
+      MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
+      switch (status.MPI_TAG) {
         case MSG_WORK_SENT:
-          // prisel zasobnik, nacti
+          createStackFromReceived(stuff); // TODO
           p_index = 0;
+          break;
         case MSG_WORK_NOWORK:
           p_index++;
+          break;
         case MSG_FINISH:
-          if ( my_rank == 0) {
-            compareBestresults()
+          if (my_rank == 0) {
+            compareBestResults(); // TODO compare and choose the best
           } else {
-            sendResultsToP0();
+            sendResultsToP0(); // TODO
             return 0;
           }
+          break;
         case MSG_TOKEN:
           if ( my_rank == 0) {
             if (white) {
-              // for all processes send MSG_FINISH
+              for (int i = 1; i < p_count; i++) {
+                send(MSG_FINISH, i);
+            } else {
+              token_sent = 0;
+              // nothing sendToken is called elsewhere
             }
           } else {
-            // return black if can't request any more work
+            if (work_requested) {
+              reply(TOKEN_BLACK);
+            } else {
+              reply(TOKEN_WHITE);
+            }
           }
+          break;
+        default:
+          raiseError("Invalid MPI tag: %d\n", status.MPI_TAG); // TODO
       }
-
-
     }
       
       
