@@ -4,6 +4,7 @@
 #include "stack.h"
 #include "fitting.h"
 #include <limits.h>
+#include "parallel.h"
 
 
 
@@ -40,7 +41,6 @@ char ** map;
 char ** bestMap;
 long double bestScore = 9999999;
 char frequencies[7] = {0};
-int workRequested = 0; // Have  we been asked for work?
 
 #define MSG_WORK_REQUEST 1000
 #define MSG_WORK_SENT    1001
@@ -52,27 +52,24 @@ int workRequested = 0; // Have  we been asked for work?
 #define TOKEN_WHITE 0
 
 int main(int argc, char** argv) {
-    //TODO MPI_Init(&argc, &argv);
-    //TODO initMPI();
-    //
-
-    int my_rank, p_cnt, p_index, finished, 
+    int my_rank, p_cnt, p_index, finished,
         passes_cnt, msg_arrived, status,
         work_requested;
 
-    // P0 onlny
+    // P0 only
     int token_sent;
     token_sent = 0;
 
     MPI_Init( &argc, &argv );
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &p_count);
+    parallel_init();
 
-    // Initialization
+    /* Parallel initialization */
     if (my_rank == 0) {
       // TODO branch until stack.size < p_count + 1
-      for (int i = 1; i < p_count; i++) {
-        sendWork(stack_part, i); // send part of stack to process i
+      for (int p_i = 1; p_i < p_cnt; p_i++) {
+        sendWork(p_i, 0); // Send one node+subtree to p_i
       }
     } else {
       // TODO blocking wait until MSG_WORK_SENT arrives
@@ -87,14 +84,16 @@ int main(int argc, char** argv) {
     while (!finished) {
       while (!isStackEmpty()) {
         // TODO do sequential stuff
+
+        /* Check for work requests */
         if (passes_cnt > 100) {
           MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
           if (msg_arrived) {
             switch (status.MPI_TAG) {
               case MSG_WORK_REQUEST:
-                // someone asked for work - send part of stack/NO_WORK
+                // Someone asked for work - send part of stack/NO_WORK
                 if (isStackSplittable()) { // TODO
-                  sendPartOfStack(); // TODO
+                  sendWork(p, 1); // TODO get p somewhere
                 } else {
                   reply(NO_WORK); // TODO
                 }
@@ -114,7 +113,7 @@ int main(int argc, char** argv) {
       }
 
       // Is there any process I haven't asked?
-      if (p_index < p_count) {
+      if (p_index < p_cnt) {
         // request work from process p_index
         if (p_index == my_rank) p_index++;
         requestWork(p_index); // TODO
@@ -129,7 +128,7 @@ int main(int argc, char** argv) {
       MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
       switch (status.MPI_TAG) {
         case MSG_WORK_SENT:
-          createStackFromReceived(stuff); // TODO
+          processIncomingWork();
           p_index = 0;
           break;
         case MSG_WORK_NOWORK:

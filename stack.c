@@ -72,14 +72,28 @@ State *stackPushStateWithPoppedInfo(State* currentState, int isBranched){
     return currentState;
 }
 
-/*
- * Metoda pro rozdeleni zasobniku D-ADZ (puleni u dna)
- */
-int stackSplit(State **states, int half) {
+int isStackSplittable(void){
     if(isStackEmpty()){
         //printf("(%d) Stack is empty.\n", rank);
         return 0;
     }
+
+    Node *node = stackBottom;
+    while(node->isBranched){
+        node = node->next;
+        if(node == NULL_NODE){
+            //printf("(%d) Stack contains only branched nodes.\n", rank);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+/*
+ * Split the stack with D-ADZ method (half at the bottom)
+ */
+int stackSplit(State **states, int half) {
+    if(!isStackSplittable()) return 0;
 
     Node *node = stackBottom;
     while(node->isBranched){
