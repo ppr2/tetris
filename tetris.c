@@ -45,6 +45,63 @@ int workRequested = 0; // Have  we been asked for work?
 int main(int argc, char** argv) {
     //TODO MPI_Init(&argc, &argv);
     //TODO initMPI();
+      
+    p_index = 0;
+    while (status != FINISHED) {
+      while (!isStackEmpty()) {
+        // do sequential stuff
+        if (more than 100 passes) {
+          tag = get_mpi_tag
+          switch (tag) {
+            case MSG_WORK_REQUEST:
+              // someone asked for work - send part of stack/NO_WORK
+            case MSG_TOKEN:
+              // P0 asked for token
+              // respond black
+            default:
+              error
+          }
+        }
+      }
+
+      if (hasnt asked everybody yet) {
+        requestWork(p_index); // one processor at time
+      } else {
+        if ( my_rank == 0 ) {
+          if (token hasn't been sent) {
+            sendToken() 
+          }
+        }
+      }
+      switch (get_mpi_tag) {
+        case MSG_WORK_SENT:
+          // prisel zasobnik, nacti
+          p_index = 0;
+        case MSG_WORK_NOWORK:
+          p_index++;
+        case MSG_FINISH:
+          if ( my_rank == 0) {
+            compareBestresults()
+          } else {
+            sendResultsToP0();
+            return 0;
+          }
+        case MSG_TOKEN:
+          if ( my_rank == 0) {
+            if (white) {
+              // for all processes send MSG_FINISH
+            }
+          } else {
+            // return black if can't request any more work
+          }
+      }
+
+
+    }
+      
+      
+      
+      
     if (argc < 3 || argc > 4) {
       fprintf(stderr, "Invalid number of arguments. Call tetris WIDTH HEIGHT [DEBUG]\n");
       return 1;
