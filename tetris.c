@@ -5,18 +5,87 @@
 #include "fitting.h"
 #include <limits.h>
 #include "parallel.h"
+#include <mpi.h>
 
-
+/*
+ *
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ * TODO
+ *
+ * jen aby sis vsimnul. jeste na to kouknu, ale jediny co jeste neni poreseny
+ * je realny posilani zprav. nekoukal jsem jeste jak serializovat zasobnik
+ * a jak posilat ten zbytek, podle me to bude vzdycky jinak podle tagu zpravy
+ * se budou lisity type a delky zprav
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * */
 
 /************************************************
  * LOCAL FUNCTIONS
  ************************************************/
-char ** newMap();
+char ** newMap(void);
 void freeMap(char **);
 void copyMap(char ** dest, char ** source);
 int isLeaf(State *);
 void branchFrom(State *);
-void computeScore();
+void computeScore(void);
+void branchIfYouCan(void);
+void parseInnerMessages(void);
+int processFinish(void);
+void processToken(void);
+void branchUntilStackSizeIsBigEnoughToSplit(void); // used in parallelInit
 
 /************************************************
  * GLOBAL VARIABLES
@@ -27,9 +96,9 @@ void computeScore();
 #define _HEIGHT 4
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
-int WIDTH  ;//= _WIDTH;
-int HEIGHT ;//= _HEIGHT;
-int DEBUG  ;//= _DEBUG;
+int WIDTH  = 4;//= _WIDTH;
+int HEIGHT = 5;//= _HEIGHT;
+int DEBUG  = 0;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
 const int INDEX_MAX = _INDEX_MAX;
 
@@ -41,6 +110,10 @@ char ** map;
 char ** bestMap;
 long double bestScore = 9999999;
 char frequencies[7] = {0};
+int p_cnt; // processor count
+int msg_arrived;
+int my_rank;
+MPI_Status status;
 
 #define MSG_WORK_REQUEST 1000
 #define MSG_WORK_SENT    1001
@@ -51,10 +124,11 @@ char frequencies[7] = {0};
 #define TOKEN_BLACK 1
 #define TOKEN_WHITE 0
 
+
 int main(int argc, char** argv) {
-    int my_rank, p_cnt, p_index, finished,
-        passes_cnt, msg_arrived, status,
+    int p_index,
         work_requested;
+    MPI_Status status;
 
     // P0 only
     int token_sent;
@@ -62,123 +136,137 @@ int main(int argc, char** argv) {
 
     MPI_Init( &argc, &argv );
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &p_count);
-    parallel_init();
+    MPI_Comm_size(MPI_COMM_WORLD, &p_cnt);
+    map = newMap();
+    parallelInit(my_rank);
 
-    /* Parallel initialization */
-    if (my_rank == 0) {
-      // TODO branch until stack.size < p_count + 1
-      for (int p_i = 1; p_i < p_cnt; p_i++) {
-        sendWork(p_i, 0); // Send one node+subtree to p_i
-      }
-    } else {
-      // TODO blocking wait until MSG_WORK_SENT arrives
-      createStackFromReceived(stuff); // TODO
-    }
 
-      
     p_index = 0;        // index of work giver
-    finished = 0;       // flag whether this process is finished
-    passes_cnt = 0;     // how many loop passes were between MPI queue checking
     work_requested = 0; // is this process waiting for more work?
-    while (!finished) {
-      while (!isStackEmpty()) {
-        // TODO do sequential stuff
+    while (1) {
+        branchIfYouCan();
 
-        /* Check for work requests */
-        if (passes_cnt > 100) {
-          MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
-          if (msg_arrived) {
+        // Is there any process I haven't asked for work yet?
+        if (p_index < p_cnt) {
+            // request work from process p_index
+            if (p_index == my_rank) p_index++;
+            requestWork(p_index); // TODO
+            work_requested = 1;
+        } else {
+            // I asked everyone. If I'm p0 send token
+            if (my_rank == 0 && !token_sent) {
+                sendTokenToNeighbour(TOKEN_WHITE); // TODO
+                token_sent = 1;
+            }
+        }
+
+        MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
+        if (msg_arrived) {
             switch (status.MPI_TAG) {
-              case MSG_WORK_REQUEST:
-                // Someone asked for work - send part of stack/NO_WORK
-                if (isStackSplittable()) { // TODO
-                  sendWork(p, 1); // TODO get p somewhere
-                } else {
-                  reply(NO_WORK); // TODO
-                }
-                break;
-              case MSG_TOKEN:
-                // P0 asked for token
-                // respond black
-                reply(TOKEN_BLACK); //TODO
-                break;
-              default:
-                raiseError("Invalid MPI tag: %d\n", status.MPI_TAG); // TODO
+                case MSG_WORK_SENT:
+                    processIncomingWork();
+                    p_index = 0;
+                    break;
+                case MSG_WORK_NOWORK:
+                    p_index++;
+                    break;
+                case MSG_FINISH:
+                    if (processFinish()) {
+                        return 0;
+                    }
+                    break;
+                case MSG_TOKEN:
+                    processToken(msg_arrived);
+                    break;
+                default:
+                    raiseError("Invalid MPI tag: %d\n", status.MPI_TAG); // TODO
+                    return 1;
             }
-          }
-          passes_cnt = 0;
         }
-        passes_cnt++;
-      }
-
-      // Is there any process I haven't asked?
-      if (p_index < p_cnt) {
-        // request work from process p_index
-        if (p_index == my_rank) p_index++;
-        requestWork(p_index); // TODO
-        work_requested = 1;
-      } else {
-        if (my_rank == 0 && !token_sent) {
-          sendToken(); // TODO
-          token_sent = 1;
-        }
-      }
-
-      MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
-      switch (status.MPI_TAG) {
-        case MSG_WORK_SENT:
-          processIncomingWork();
-          p_index = 0;
-          break;
-        case MSG_WORK_NOWORK:
-          p_index++;
-          break;
-        case MSG_FINISH:
-          if (my_rank == 0) {
-            compareBestResults(); // TODO compare and choose the best
-          } else {
-            sendResultsToP0(); // TODO
-            return 0;
-          }
-          break;
-        case MSG_TOKEN:
-          if ( my_rank == 0) {
-            if (white) {
-              for (int i = 1; i < p_count; i++) {
-                send(MSG_FINISH, i);
-            } else {
-              token_sent = 0;
-              // nothing sendToken is called elsewhere
-            }
-          } else {
-            if (work_requested) {
-              reply(TOKEN_BLACK);
-            } else {
-              reply(TOKEN_WHITE);
-            }
-          }
-          break;
-        default:
-          raiseError("Invalid MPI tag: %d\n", status.MPI_TAG); // TODO
-      }
     }
       
       
-      
-      
-    if (argc < 3 || argc > 4) {
-      fprintf(stderr, "Invalid number of arguments. Call tetris WIDTH HEIGHT [DEBUG]\n");
-      return 1;
+    /* Results output */
+    printf("\n--- RESULTS ---\n");
+    if (bestMap == NULL) {
+        printf("bestMap is null, it definitely won't blend :(\n");
+    } else {
+        printMap(bestMap);
+        printf("score -> %Lf\n", bestScore);
+        printf("\n");
     }
-    WIDTH = atoi(argv[1]);
-    HEIGHT = atoi(argv[2]);
-    DEBUG = argc == 4 ? atoi(argv[3]) : 0;
+
+    /* Free global structures */
+    freeMap(map);
+    freeMap(bestMap);
+
+    MPI_Finalize(); // TODO
+
+    return 0;
+}
+
+void processToken(some_type msg_arrived) {
+    if (my_rank == 0) {
+        // TODO parse receivedToken from msg_arrived
+        // It came through the whole circle
+        if (receivedToken == TOKEN_WHITE) {
+            // End calculation send MSG_FINISH
+            sendFinishToNeighbour(my_rank);
+        } else {
+            sendTokenToNeighbour(TOKEN_WHITE);
+            token_sent = 1;
+        }
+    } else {
+        int tokenToSend =
+                receivedToken == TOKEN_BLACK ? TOKEN_BLACK : (work_requested == 0 ? TOKEN_WHITE : TOKEN_BLACK);
+        sendTokenToNeighbour(tokenToSend);
+    }
+}
+
+
+void branchUntilStackSizeIsBigEnoughToSplit(void) {
     /* Init */
     Node *currentNode;
     State *currentState;
-    map = newMap();
     stackPushState(newState(0, EMPTY, 0));
+
+    /* Main cycle */
+    while (!isStackEmpty() || stackSize() < p_cnt + 1) {
+        currentNode = stackPeek();
+        currentState = currentNode->state;
+
+        /* Process current node */
+        if ( !currentNode->isBranched) {
+            frequencies[getSimpleShape(currentState->shape)]++;
+        }
+        if(DEBUG){printf("fit i%d s%d\n", currentState->index, currentState->shape);}
+
+        fit(currentState, currentState->shape); // Fit: Fit shape to place index
+        if (currentNode->isBranched || isLeaf(currentNode->state)) {
+            if(DEBUG){printf("unfit i%d s%d\n", currentState->index, currentState->shape);}
+
+            fit(currentState, EMPTY); // Unfit: Remove shape at index (replace with EMPTY=0)
+
+            if (isLeaf(currentNode->state)) {
+            }
+
+            frequencies[getSimpleShape(currentState->shape)]--;
+            stackDeleteTop();
+        } else { // Expand current node
+            branchFrom(currentState);
+            currentNode->isBranched = 1;
+        }
+
+        if (DEBUG && DEBUG_STEPS) {getc(stdin);}
+    }
+}
+
+void branchIfYouCan(void) {
+    /* Init */
+    Node *currentNode;
+    State *currentState;
+
+    int passes_cnt = 0;     // how many loop passes were between MPI queue checking
 
     /* Main cycle */
     while (!isStackEmpty()) {
@@ -197,7 +285,8 @@ int main(int argc, char** argv) {
 
             fit(currentState, EMPTY); // Unfit: Remove shape at index (replace with EMPTY=0)
 
-            if (isLeaf(currentNode->state)) {computeScore();}
+            if (isLeaf(currentNode->state)) {
+            }
 
             frequencies[getSimpleShape(currentState->shape)]--;
             stackDeleteTop();
@@ -207,26 +296,53 @@ int main(int argc, char** argv) {
         }
 
         if (DEBUG && DEBUG_STEPS) {getc(stdin);}
+
+        if (passes_cnt > 100) {
+            parseInnerMessages();
+            passes_cnt = 0;
+        }
+        passes_cnt++;
     }
-
-    /* Results output */
-    printf("\n--- RESULTS ---\n");
-    if (bestMap == NULL) {
-        printf("bestMap is null, it definitely won't blend :(\n");
-    } else {
-        printMap(bestMap);
-        printf("score -> %Lf\n", bestScore);
-        printf("\n");
-    }
-
-    /* Free global structures */
-    freeMap(map);
-    freeMap(bestMap);
-
-    //TODO MPI_Finalize();
-
-    return 0;
 }
+
+void parseInnerMessages(void) {
+    MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
+    if (msg_arrived) {
+        switch (status.MPI_TAG) {
+            case MSG_WORK_REQUEST:
+                // Someone asked for work - send part of stack/NO_WORK
+                if (isStackSplittable()) { // TODO
+                    sendWork(status.MPI_SOURCE, 1);
+                } else {
+                    reply(NO_WORK); // TODO
+                }
+                break;
+            case MSG_TOKEN:
+                // P0 asked for token
+                // respond black
+                sendTokenToNeighbour(TOKEN_BLACK); //TODO
+                break;
+            default:
+                raiseError("Invalid MPI tag=%d from p=%d\n", status.MPI_TAG, status.MPI_SOURCE); // TODO
+        }
+    }
+}
+
+
+// deal with MSG_FINISH tag
+int processFinish(void) {
+    if (my_rank == 0) {
+        compareBestResults(); // TODO compare and choose the best
+        // TODO free memory
+
+        return doIHaveResultsFromAllProcesses ? 1 : 0;
+    } else {
+        sendResultsToP0(); // TODO
+        // TODO free memory
+        return 1;
+    }
+}
+
 
 void branchFrom(State * state) {
     Shape shape;

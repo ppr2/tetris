@@ -20,7 +20,7 @@ int tokenColor = TOKEN_WHITE;
 
 int solutionSent = 0;
 
-int workSenderRank = -1;
+//int workSenderRank = -1;
 
 MPI_Request *solutionRequests;
 
@@ -32,11 +32,40 @@ int dataArrayLength = 16384;
 int dataArray[16384];
 
 
-void parallelInit(void){
+void sendTokenToNeighbour(int token) {
+    // TODO
+}
+void sendFinishToNeighbour(int my_rank) {
+    /*
+     * send_request_to_finish_to_neighbour
+     * if my_rank != 0
+     *   send_results_to_p0
+     *
+     * */
+    // TODO
+}
+
+void parallelInit(int my_rank){
+/*
     workSenderRank = (rank == 0) ? worldSize - 1 : rank - 1; // Set previous process as work donor
     solutionRequests = (MPI_Request*) malloc(worldSize * sizeof(MPI_Request));
     solutionArray = (int*) malloc(stateMaxLength * sizeof(int));
     token = (rank == 0) ? 1 : 0;
+*/
+
+
+    /* Parallel initialization */
+    if (my_rank == 0) {
+        branchUntilStackSizeIsBigEnoughToSplit();
+        for (int p_i = 1; p_i < stackSize() - 1; p_i++) {
+            sendWork(p_i, 0); // Send one node to p_i
+        }
+    } else {
+        // FINISH or new work can be received
+        //MPI_Recv(message, LENGTH, MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        // TODO blocking wait until MSG_WORK_SENT arrives
+        createStackFromReceived(stuff); // TODO
+    }
 }
 
 /************************************************
@@ -80,8 +109,8 @@ void sendWork(int p_recipient, int half){
 /**
  * Request more work
  */
-void requestWork(void) {
-    /* Check for token */
+void requestWork(int workSenderRank) {
+/*    *//* Check for token *//*
     if(token){
         // Where should the token be sent?
         int p_recipient = (rank == worldSize - 1) ? 0 : rank + 1;
@@ -90,10 +119,16 @@ void requestWork(void) {
         MPI_Send(&tokenColor, 1, MPI_INT, p_recipient, MSG_TOKEN, MPI_COMM_WORLD);
         token = 0; // Unset token, I don't have it anymore
     }
-    tokenColor = WHITE; // I am IDLE -> color token white
+    tokenColor = WHITE; // I am IDLE -> color token white*/
 
     /* Send the work request */
     MPI_Isend(workRequestData, workRequestDataLength, MPI_CHAR, workSenderRank, MSG_WORK_REQUEST, MPI_COMM_WORLD, &outcomingWorkRequest);
+    // TODO
+    /*
+     * tokeny zpracovavame jinde, ty tady asi nemusi byt
+     * workRequstData a lenght muzou byt 0
+     * zprava se preda tagem MSG_WORK_REQUEST
+     * */
 }
 
 /**
