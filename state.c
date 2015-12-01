@@ -33,15 +33,6 @@ State getStateFromArray(int *arr, int *index){
     return *newState(sindex, shape, depth);
 }
 
-int getArrayFromStates(int **arr, State *states, int statesCount){
-    if(statesCount <= 0){return 0;}
-    //TODO
-}
-
-void freeState(State* state) {
-    free(state);
-}
-
 int getSimpleShape(Shape shape) {
     switch (shape) {
         case EMPTY:

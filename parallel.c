@@ -3,13 +3,15 @@
 #include "state.h"
 
 #define MSG_WORK_REQUEST 1000
-#define MSG_WORK_SENT    1001
+#define MSG_WORK_BATCH    1001
 #define MSG_WORK_NOWORK  1002
 #define MSG_TOKEN        1003
 #define MSG_FINISH       1004
 
 #define TOKEN_BLACK 1
 #define TOKEN_WHITE 0
+
+#define MAX_MSG_LENGTH (WIDTH*HEIGHT*20)/2
 
 /************************************************
  * INIT
@@ -28,43 +30,86 @@ MPI_Request incomingWorkRequest;
 MPI_Request outcomingWorkRequest;
 
 int *solutionArray;
-int dataArrayLength = 16384;
-int dataArray[16384];
 
+void processToken(int my_rank, int p_cnt) {
+    MPI_Status status;
+    int token;
 
-void sendTokenToNeighbour(int token) {
-    // TODO
+    MPI_Recv(&token, 1, MPI_INT, MPI_ANY_SOURCE, MSG_TOKEN, MPI_COMM_WORLD, &status);
+    waitForUnfinishedSending();
+
+    if (my_rank == 0) {
+        // It came through the whole circle
+        if (token == TOKEN_WHITE) {
+            sendFinishToNeighbour(my_rank, p_cnt);
+        } else {
+            sendTokenToNeighbour(TOKEN_WHITE, my_rank, p_cnt);
+        }
+    } else {
+        int tokenToSend;
+
+        if (token == TOKEN_BLACK) {
+            tokenToSend = TOKEN_BLACK;
+        } else {
+            tokenToSend = work_requested == 0 ? TOKEN_WHITE : TOKEN_BLACK;
+        }
+        sendTokenToNeighbour(tokenToSend, my_rank, p_cnt);
+    }
 }
-void sendFinishToNeighbour(int my_rank) {
-    /*
-     * send_request_to_finish_to_neighbour
-     * if my_rank != 0
-     *   send_results_to_p0
-     *
-     * */
-    // TODO
+
+void sendTokenToNeighbour(int token, int my_rank, int p_cnt) {
+    int neighbourRank = my_rank == p_cnt - 1 ? 0 : my_rank + 1;
+
+    waitForUnfinishedSending();
+    MPI_send(&token, 1, MPI_INT, neighbourRank, MSG_TOKEN, MPI_COMM_WORLD);
 }
 
-void parallelInit(int my_rank){
-/*
-    workSenderRank = (rank == 0) ? worldSize - 1 : rank - 1; // Set previous process as work donor
-    solutionRequests = (MPI_Request*) malloc(worldSize * sizeof(MPI_Request));
-    solutionArray = (int*) malloc(stateMaxLength * sizeof(int));
-    token = (rank == 0) ? 1 : 0;
-*/
+void sendFinishToNeighbour(int my_rank, int p_cnt) {
+    int neighbourRank = my_rank == p_cnt - 1 ? 0 : my_rank + 1;
+    int emptyBuffer = 0;
 
+    waitForUnfinishedSending();
+    MPI_send(&emptyBuffer, 1, MPI_INT, neighbourRank, MSG_FINISH, MPI_COMM_WORLD);
+}
 
-    /* Parallel initialization */
+void parallelInit(int my_rank) {
+
     if (my_rank == 0) {
         branchUntilStackSizeIsBigEnoughToSplit();
         for (int p_i = 1; p_i < stackSize() - 1; p_i++) {
             sendWork(p_i, 0); // Send one node to p_i
         }
     } else {
-        // FINISH or new work can be received
-        //MPI_Recv(message, LENGTH, MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-        // TODO blocking wait until MSG_WORK_SENT arrives
-        createStackFromReceived(stuff); // TODO
+        int *dataArray;
+        int dataLength;
+        int flag;
+        MPI_Status status;
+
+        printf("RANK=%d waiting for msg\n", my_rank);
+        // Wait for initial message, can receive MSG_FINISH or MSG_TOKEN
+        do {
+            MPI_Iprobe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &status);
+        } while (!flag);
+        MPI_Get_count(&status, MPI_INT, &dataLength);
+        dataArray = (int) malloc(sizeof(int) * dataLength);
+        MPI_Recv(dataArray, dataLength, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+        switch (status.MPI_TAG) {
+            case MSG_FINISH:
+                printf("RANK=%d received finish\n", my_rank);
+                MPI_Finalize();
+                exit(0);
+                break;
+            case MSG_WORK_SENT:
+                printf("RANK=%d received token %d\n", my_rank, message);
+                createStackAndMapFromReceived(dataArray);
+                break;
+            default:
+                //TODO ERROR
+                printf("error\n");
+                MPI_Finalize();
+                exit(1);
+        }
     }
 }
 
@@ -72,34 +117,40 @@ void parallelInit(int my_rank){
  * WORK functions
  ************************************************/
 
+
+void sendNoWork(int requester) {
+    int emptyBuffer = 0;
+
+    waitForUnfinishedSending();
+    MPI_send(&emptyBuffer, 1, MPI_INT, requester, MSG_WORK_NOWORK, MPI_COMM_WORLD);
+}
 /**
  * Send part of the stack to CPU p_recipient
  * half - send half of stack row (1) or just one element and its subtree (0)?
  */
-void sendWork(int p_recipient, int half){
+void sendWork(int p_recipient, int half) {
     /* Get states from stack cutting */
     State *states;
     int statesCount = stackSplit(&states, half);
+    int dataArray[statesCount*3 + WIDTH*HEIGHT]; // *3 because state consists of 3 integers
     /* Serialize the states to array, save that to dataArray */
-    int *pointer = &dataArray[0];
-    int statesDataSize = getArrayFromStates(&pointer, states, statesCount);
-    if (statesDataSize > dataArrayLength){
+    int *p_dataArray = &dataArray[0];
+    int statesDataSize = getArrayFromStackAndMap(&p_dataArray1, states, statesCount);
+/*    if (statesDataSize > MAX_MSG_LENGTH) {
         printf("ERROR - Stack split states array size larger than limit. (p-%d)\n", rank);
-    }
+    }*/
+
+    waitForUnfinishedSending();
 
     /* Send states array to p_recipient */
     MPI_Isend(dataArray, statesDataSize, MPI_INT, p_recipient, MSG_WORK_SENT, MPI_COMM_WORLD, &incomingWorkRequest);
+    previousIncomingWorkRequestRank = p_recipient;
 
-    /* Color my state to BLACK if recipient is below */
-    if(statesDataSize > 0 && rank > p_recipient){
-        tokenColor = TOKEN_BLACK;
-    }
-
-    /* Free up memory */
-    if(statesCount > 0){
+    /* Free up memory if I sent something */
+    if(statesCount > 0) {
         // Free states
-        for(int i = 0; i < statesCount; i++){
-            freeState(states[i]);
+        for(int i = 0; i < statesCount; i++) {
+            free(states[i]);
         }
         // Free states pointer
         free(states);
@@ -110,31 +161,17 @@ void sendWork(int p_recipient, int half){
  * Request more work
  */
 void requestWork(int workSenderRank) {
-/*    *//* Check for token *//*
-    if(token){
-        // Where should the token be sent?
-        int p_recipient = (rank == worldSize - 1) ? 0 : rank + 1;
-        if(rank == 0){tokenColor = WHITE;}
-        // I am IDLE && have token => send it to the next one
-        MPI_Send(&tokenColor, 1, MPI_INT, p_recipient, MSG_TOKEN, MPI_COMM_WORLD);
-        token = 0; // Unset token, I don't have it anymore
-    }
-    tokenColor = WHITE; // I am IDLE -> color token white*/
+    int emptyBuffer = 0;
 
+    waitForUnfinishedSending();
     /* Send the work request */
-    MPI_Isend(workRequestData, workRequestDataLength, MPI_CHAR, workSenderRank, MSG_WORK_REQUEST, MPI_COMM_WORLD, &outcomingWorkRequest);
-    // TODO
-    /*
-     * tokeny zpracovavame jinde, ty tady asi nemusi byt
-     * workRequstData a lenght muzou byt 0
-     * zprava se preda tagem MSG_WORK_REQUEST
-     * */
+    MPI_send(&emptyBuffer, 1, MPI_INT, workSenderRank, MSG_WORK_REQUEST, MPI_COMM_WORLD);
 }
 
 /**
  * Work on incoming work, which we have requested
  */
-int processIncomingWork(void) {
+int processIncomingWork(int workSource) {
     /* Get incoming message */
     int receivedDataSize;
     MPI_Get_count(&status, MPI_INT, &receivedDataSize);
@@ -244,4 +281,13 @@ void checkToken(void) {
         }
     }
     tokenProbeCount -= tokenProbeThreshold + 1;
+}
+
+void waitForUnfinishedSending(void) {
+    /* Check for unfinished sending */
+    if(previousIncomingWorkRequestRank >= 0) {
+        /* Wait for previous sending to finish */
+        MPI_Wait(&incomingWorkRequest, &status);
+        previousIncomingWorkRequestRank = -1;
+    }
 }

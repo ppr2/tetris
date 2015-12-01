@@ -24,5 +24,7 @@ int isStackEmpty();
 
 void freeNode(Node *node);
 
+int getArrayFromStackAndMap(int **arr, State *states, int statesCount);
+void createStackAndMapFromReceived(int *arr);
 
 #endif

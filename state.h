@@ -90,7 +90,6 @@ typedef struct{
 State* newState(int index, Shape shape, int depth);
 State getStateFromArray(int *arr, int *index);
 void getArrayFromState(int *arr, State *state, int index);
-void freeState(State* state);
 int getSimpleShape(Shape shape);
 
 

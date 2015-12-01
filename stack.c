@@ -154,6 +154,19 @@ int isStackEmpty(){
 }
 
 void freeNode(Node *node){
-    freeState(node->state);
+    free(node->state);
     free(node);
+}
+
+
+int getArrayFromStackAndMap(int **arr, State *states, int statesCount){
+    // TODO put map for the stack part at the begining. free new map pointer here
+    // udelat to tak, aby se nody serializovaly ve spravnem poradi
+    // taky udelat (int) state->shape
+    if(statesCount <= 0){return 0;}
+    //TODO
+}
+
+void createStackAndMapFromReceived(int *arr) {
+    // vytvor nody z arr, musi byt poporade a nesmi byt branched
 }
