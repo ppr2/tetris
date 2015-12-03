@@ -202,15 +202,15 @@ void receiveSolution(void) {
 
 }
 
-void transmitSolution(State *solution) {
-
-    /* Convert solution State to array */
-    getArrayFromState(solutionArray, solution, 0);
-    /* Send solution array to everyone except me */
-    for(i = 0; i < worldSize; i++){
-        if(i != rank){
-            MPI_Isend(solutionArray, stateMaxLength, MPI_SHORT, i, SOLUTION_TRANSMIT, MPI_COMM_WORLD, &solutionRequests[i]);
+void transmitSolution() {
+    long double * solutionArray = (double*)malloc((WIDTH*HEIGHT+1)*sizeof(double));
+    int counter = 1;
+    solutionArray[0] = bestScore;
+    for(int i = 0; i < WIDTH; i++) {
+        for (int j = 0; j < HEIGHT; j++) {
+            solutionArray[counter] = (long double)bestMap[i][j];
+            counter++;
         }
     }
-    solutionSent = 1;
+    MPI_send(solutionArray, counter, MPI_LONG_DOUBLE, 0, MSG_FINISH, MPI_COMM_WORLD);
 }
