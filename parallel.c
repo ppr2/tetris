@@ -136,9 +136,6 @@ void sendWork(int p_recipient, int half) {
     /* Serialize the states to array, save that to dataArray */
     int *p_dataArray = &dataArray[0];
     int statesDataSize = getArrayFromStackAndMap(&p_dataArray1, states, statesCount);
-/*    if (statesDataSize > MAX_MSG_LENGTH) {
-        printf("ERROR - Stack split states array size larger than limit. (p-%d)\n", rank);
-    }*/
 
     waitForUnfinishedSending();
 
@@ -202,50 +199,16 @@ int processIncomingWork(int workSource) {
     free(receivedData);
 }
 
-
-
-
-
-
-
-/******* TODO NOT YET USED/DONE, before implementation check if it can be used ***************/
-
-
-void checkSolution(void) {
-    int i;
-    /* Check all processes for outcoming solutions */
-    for(i = 0; i < worldSize; i++){
-        if(i == rank) continue; // Current CPU => next
-        int flag = 0;
-        MPI_Iprobe(i, SOLUTION_TRANSMIT, MPI_COMM_WORLD, &flag, &status);
-        if(flag){ // process i sends a solution
-            int solutionArray[stateMaxLength];
-            MPI_Recv(solutionArray, stateMaxLength, MPI_SHORT, i, SOLUTION_TRANSMIT, MPI_COMM_WORLD, &status);
-
-            int index = 0;
-            /* Convert solution array to State */
-            State solution = getStateFromArray(solutionArray, &index);
-//            if(!STAR || rank == 0){
-//                printf("(%d) Incoming solution from process %d:\n", rank, i);
-//            }
-            //TODO(tetris.c) setBestSolution(solution);
-        }
+void waitForUnfinishedSending(void) {
+    /* Check for unfinished sending */
+    if(previousIncomingWorkRequestRank >= 0) {
+        /* Wait for previous sending to finish */
+        MPI_Wait(&incomingWorkRequest, &status);
+        previousIncomingWorkRequestRank = -1;
     }
-
 }
 
 void transmitSolution(State *solution) {
-    int i;
-    //musíme dokončit všechny předchozí poslání řešení
-    if(solutionSent){
-        for(i = 0; i < worldSize; i++){
-            //dokončení non-blocking sendu (a čekání, pokud se ještě některá
-            //data nestihla odeslat)
-            if(i != rank){
-                MPI_Wait(&solutionRequests[i], &status);
-            }
-        }
-    }
 
     /* Convert solution State to array */
     getArrayFromState(solutionArray, solution, 0);
@@ -256,38 +219,4 @@ void transmitSolution(State *solution) {
         }
     }
     solutionSent = 1;
-}
-
-
-void checkToken(void) {
-    //spočítáme si, od koho by mohl pešek přijít
-    int process = (rank == 0) ? worldSize - 1 : rank - 1;
-    int flag = 0;
-    MPI_Iprobe(process, TOKEN, MPI_COMM_WORLD, &flag, &status);
-    if(flag){
-        //přišel nám pešek
-        MPI_Recv(&tokenColor, 1, MPI_INT, process, TOKEN, MPI_COMM_WORLD, &status);
-        if(!STAR || rank == 0){
-            printf("TOKEN (%d) Process %d received token with color %s from process %d.\n", rank, rank, tokenColor == TOKEN_WHITE ? "TOKEN_WHITE" : "TOKEN_BLACK", process);
-        }
-        token = 1;
-        //pokud jsme 0 a příšel bílý pešek => máme padla, hoši
-        if(rank == 0 && tokenColor == TOKEN_WHITE){
-            transmitWorkEnd();
-            endWork = 1;
-        }
-        if(processColor == TOKEN_BLACK){
-            tokenColor = TOKEN_BLACK;
-        }
-    }
-    tokenProbeCount -= tokenProbeThreshold + 1;
-}
-
-void waitForUnfinishedSending(void) {
-    /* Check for unfinished sending */
-    if(previousIncomingWorkRequestRank >= 0) {
-        /* Wait for previous sending to finish */
-        MPI_Wait(&incomingWorkRequest, &status);
-        previousIncomingWorkRequestRank = -1;
-    }
 }

@@ -277,7 +277,7 @@ int processFinish(void) {
             return 0;
         }
     } else {
-        sendResultsToP0(); // TODO blocking!
+        transmitSolution();
         sendFinishToNeighbour(my_rank, p_cnt);
         // TODO free memory
         /* Free global structures */
