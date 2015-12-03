@@ -186,7 +186,7 @@ int getArrayFromStackAndMap(int **arr, State *states, int statesCount){
         arr[mapLen+i] = statesToSerialize+i;
     }
 
-    return size*sizeof(int);
+    return size;
 }
 
 void createStackAndMapFromReceived(int *arr, int dataLength) {
