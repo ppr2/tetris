@@ -23,12 +23,12 @@ void getArrayFromState(int *arr, State *state, int *index){
 State getStateFromArray(int *arr, int *index){
     int i = *index;
 
-    int index = arr[i++];
+    int stateIndex = arr[i++];
     Shape shape = (Shape)arr[i++];
     int depth = arr[i++];
 
     *index = i;
-    return *newState(sindex, shape, depth);
+    return *newState(stateIndex, shape, depth);
 }
 
 int getSimpleShape(Shape shape) {

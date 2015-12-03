@@ -168,22 +168,23 @@ int getArrayFromStackAndMap(int **arr, State *states, int statesCount){
     int size = mapLen + stateLen * statesCount;
 
     // Get serialized map
-    int * mapToSerialize = newMap();
-    int * statesToSerialize = (int*)malloc(stateLen*statesCount);
+    int * mapToSerialize = (int*)malloc(mapLen*sizeof(int));
+    int * statesToSerialize = (int*)malloc(stateLen*statesCount*sizeof(int));
     copyMapToIntArray(mapToSerialize, map);
 
     // Get serialized states
-    int counter = 0, *counter_p = (int*)&counter;
+    int counter = 0, *counter_p = &counter;
+    State * state = states;
     for(i=0;i<statesCount;i++){
-        getArrayFromState(statesToSerialize, state, counter_p);
+        getArrayFromState(statesToSerialize, state++, counter_p);
     }
 
     // Save to arr
     for(i=0;i<mapLen;i++){
-        arr[i] = mapToSerialize[i];
+        arr[i] = mapToSerialize+i;
     }
     for(i=0;i<size-mapLen;i++){
-        arr[mapLen+i] = statesToSerialize[i];
+        arr[mapLen+i] = statesToSerialize+i;
     }
 
     return size;
@@ -202,12 +203,13 @@ void createStackAndMapFromReceived(int *arr, int dataLength) {
     map = newMap();
     for(i=0;i<WIDTH;i++){
         for(j=0;j<HEIGHT;j++){
-            map[i][j] = arr[counter];
+            map[i][j] = (char) *(arr+counter);
             counter++;
         }
     }
     // Parse & push states
     while(counter < dataLength) {
-        stackPushState(getStateFromArray(arr, (*int)&counter));
+        State s = getStateFromArray(arr, &counter);
+        stackPushState(&s);
     }
 }
