@@ -198,8 +198,28 @@ int processIncomingWork(int workSource) {
     /* Free up memory */
     free(receivedData);
 }
-void receiveSolution(void) {
+void receiveSolution(int sender) {
+    int dataLength;
+    MPI_Status status;
 
+    MPI_Get_count(&status, MPI_INT, &dataLength);
+    long double dataArray[dataLength];
+    MPI_Recv(&dataArray, dataLength, MPI_LONG_DOUBLE, sender, MSG_FINISH, MPI_COMM_WORLD, &status);
+
+    if (bestScore > dataArray[0]) {
+        int counter = 1;
+        bestScore = dataArray[0];
+        for(i=0;i<WIDTH;i++){
+            for(j=0;j<HEIGHT;j++){
+                map[i][j] = (char) *(arr+counter);
+                counter++;
+            }
+        }
+    } else {
+        // do nothing :)
+    }
+    // Mark that I have results from this sender
+    results[sender] = 1;
 }
 
 void transmitSolution() {
