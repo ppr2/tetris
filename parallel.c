@@ -106,7 +106,7 @@ void parallelInit(int my_rank) {
                 break;
             default:
                 //TODO ERROR
-                printf("error\n");
+                printf("error aaaaaaaaaaaaaaaaaaaa\n");
                 MPI_Finalize();
                 exit(1);
         }
@@ -198,14 +198,8 @@ int processIncomingWork(int workSource) {
     /* Free up memory */
     free(receivedData);
 }
+void receiveSolution(void) {
 
-void waitForUnfinishedSending(void) {
-    /* Check for unfinished sending */
-    if(previousIncomingWorkRequestRank >= 0) {
-        /* Wait for previous sending to finish */
-        MPI_Wait(&incomingWorkRequest, &status);
-        previousIncomingWorkRequestRank = -1;
-    }
 }
 
 void transmitSolution(State *solution) {
