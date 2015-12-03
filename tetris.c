@@ -34,16 +34,25 @@
  * TODO
  * TODO
  *
- * jen aby sis vsimnul. jeste na to kouknu, ale jediny co jeste neni poreseny
- * je realny posilani zprav. nekoukal jsem jeste jak serializovat zasobnik
- * a jak posilat ten zbytek, podle me to bude vzdycky jinak podle tagu zpravy
- * se budou lisity type a delky zprav
+ * je potreba doimplementovat funkce sendWork, resp. v ni jen funkci
+ * getArrayFromStackAndMap - ktera by mela do pole integeru vlozit stack
+ * rozlozenej na Staty (3x int) a mapu ((WIDTH*HEIGHT)x int)
+ *   -nejsem si tam jistej jestli k tomu nejsou potreba i ty ukazatele, ktery
+ *   jsou v tech nodech co obaluji state, kdyz bys bral kus stacku reprezentujici
+ *   kus stromu o vice patrech
+ *
+ * a potom je treba opacna funkce co to zase rozbali createStackAndMapFromReceived
+ *
+ * a nakonec kdyby ses nudil je treba celou logiku projit jestli tam nejsou
+ * bullshity a pridat chybovy hlasky
+ *
+ * ja pak musim dopsat funci sendResultsToP0 - melo by byt v pohode, jen se domluvime
+ * jestli staci cislo nebo chceme i mapu a vymyslet jakou vsechnu pamet uvolnit v
+ * processFinish
+ * pokud mas na neco z toho chut, tak se do toho klidne pust ;)
  *
  *
- *
- *
- *
- *
+ * +nektery funkce se jmenujou fakt dost uhozene, neboj se to prejmenovat
  *
  *
  *
@@ -84,7 +93,6 @@ void computeScore(void);
 void branchIfYouCan(void);
 void parseInnerMessages(void);
 int processFinish(void);
-void processToken(void);
 void branchUntilStackSizeIsBigEnoughToSplit(void); // used in parallelInit
 
 /************************************************
