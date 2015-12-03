@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
-#include "tetris.h"
 
 #define NULL_NODE (Node *)0
 
-extern int size = 0;
+int size = 0;
 
-extern Node *stackTop = NULL_NODE;
-extern Node *stackBottom = NULL_NODE;
+Node *stackTop = NULL_NODE;
+Node *stackBottom = NULL_NODE;
 
 void stackPrintOut(void){
     if(isStackEmpty()){printf("\nStack is empty.\n"); return;}
