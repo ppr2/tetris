@@ -4,6 +4,7 @@
 extern int token_sent;
 extern char ** bestMap;
 extern long double bestScore;
+extern int *results;
 
 void parallelInit(int);
 

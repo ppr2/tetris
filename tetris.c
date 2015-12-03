@@ -43,13 +43,13 @@ int token_sent;
 
 char ** bestMap;
 long double bestScore = 9999999;
+int *results;      // 0/1 whether p[i] sent results
 /************************************************
  * LOCAL VARIABLES
  ************************************************/
 char frequencies[7] = {0};
 int p_cnt;         // processor count
 int my_rank;       // rank of this process
-int *results;      // 0/1 whether p[i] sent results
 int p_index;       // index of work giving process
 int workRequested; // 0/1 whether work was requested
 int shouldFinish;
@@ -279,8 +279,6 @@ int processFinish(void) {
     MPI_Status status;
     if (my_rank == 0) {
         receiveSolution();
-        // TODO zparsuj finish
-        // TODO zapis do pole vysledku
         if (doIHaveResultsFromAllProcesses()) {
             // TODO free memory
             /* Free global structures */
