@@ -106,7 +106,7 @@ void parallelInit(int my_rank) {
                 break;
             default:
                 //TODO ERROR
-                printf("error\n");
+                printf("error aaaaaaaaaaaaaaaaaaaa\n");
                 MPI_Finalize();
                 exit(1);
         }
@@ -136,9 +136,6 @@ void sendWork(int p_recipient, int half) {
     /* Serialize the states to array, save that to dataArray */
     int *p_dataArray = &dataArray[0];
     int statesDataSize = getArrayFromStackAndMap(&p_dataArray1, states, statesCount);
-/*    if (statesDataSize > MAX_MSG_LENGTH) {
-        printf("ERROR - Stack split states array size larger than limit. (p-%d)\n", rank);
-    }*/
 
     waitForUnfinishedSending();
 
@@ -201,7 +198,9 @@ int processIncomingWork(int workSource) {
     /* Free up memory */
     free(receivedData);
 }
+void receiveSolution(void) {
 
+}
 
 
 

@@ -40,17 +40,19 @@ const int INDEX_MAX = _INDEX_MAX;
 char ** map;
 
 int token_sent;
+
+char ** bestMap;
+long double bestScore = 9999999;
 /************************************************
  * LOCAL VARIABLES
  ************************************************/
-char ** bestMap;
-long double bestScore = 9999999;
 char frequencies[7] = {0};
 int p_cnt;         // processor count
 int my_rank;       // rank of this process
 int *results;      // 0/1 whether p[i] sent results
 int p_index;       // index of work giving process
 int workRequested; // 0/1 whether work was requested
+int shouldFinish;
 
 #define MSG_WORK_REQUEST 1000
 #define MSG_WORK_BATCH    1001
@@ -66,6 +68,7 @@ int main(int argc, char** argv) {
 
     // P0 only
     token_sent = 0;
+    shouldFinish = 0;
 
     MPI_Init( &argc, &argv );
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -73,7 +76,7 @@ int main(int argc, char** argv) {
     map = newMap();
     results = (int) calloc(p_cnt, sizeof(int));
 
-    parallelInit(my_rank); // TODO, needs to generate map for sending + receive data
+    parallelInit(my_rank);
 
 
     p_index = 0;        // index of work giver
@@ -81,6 +84,11 @@ int main(int argc, char** argv) {
     while (1) {
         branchIfYouCan();
 
+        if (shouldFinish) {
+            if (processFinish()) {
+                exit(0);
+            }
+        }
         // Is there any process I haven't asked for work yet?
         if (!workRequested && p_index < p_cnt) {
             // request work from process p_index
@@ -196,26 +204,24 @@ void parseOuterMessages(void) {
     if (msg_arrived) {
         switch (status.MPI_TAG) {
             case MSG_WORK_BATCH:
-                processIncomingWork(status.MPI_SOURCE); // TODO
+                processIncomingWork(status.MPI_SOURCE);
                 p_index = 0; // reset index of work giver
                 workRequested = 0;
                 break;
             case MSG_WORK_NOWORK:
                 // receive so it's not stuck in queue
-                MPI_Recv(&dump, 1, MPI_INT, 0, status.MPI_SOURCE, MPI_COMM_WORLD, &status);
+                MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
                 p_index++;   // ask another process next round
                 workRequested = 0;
                 break;
             case MSG_FINISH:
-                // receive so it's not stuck in queue
-                MPI_Recv(&dump, 1, MPI_INT, 0, status.MPI_SOURCE, MPI_COMM_WORLD, &status);
                 if (processFinish()) {
                     exit(0);
                 }
                 break;
             case MSG_TOKEN:
                 // receive so it's not stuck in queue
-                MPI_Recv(&dump, 1, MPI_INT, 0, status.MPI_SOURCE, MPI_COMM_WORLD, &status);
+                MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
                 processToken(my_rank, p_cnt);
                 break;
             default:
@@ -232,11 +238,11 @@ void parseInnerMessages(void) {
     MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
     if (msg_arrived) {
         // receive so it's not stuck in queue
-        MPI_Recv(&dump, 1, MPI_INT, 0, status.MPI_SOURCE, MPI_COMM_WORLD, &status);
+        MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
         switch (status.MPI_TAG) {
             case MSG_WORK_REQUEST:
                 // Someone asked for work - send part of stack/NO_WORK
-                if (isStackSplittable()) { // TODO ?
+                if (isStackSplittable()) {
                     sendWork(status.MPI_SOURCE, 1);
                 } else {
                     sendNoWork(status.MPI_SOURCE);
@@ -245,6 +251,12 @@ void parseInnerMessages(void) {
             case MSG_TOKEN:
                 // P0 asked for token, respond black. I'm not done yet
                 sendTokenToNeighbour(TOKEN_BLACK, my_rank, p_cnt);
+                break;
+            case MSG_FINISH:
+                // receive so it's not stuck in queue
+                MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
+                // don't ask for another work
+                shouldFinish = 1;
                 break;
             default:
                 printf("[R-%d] Invalid MPI tag: %d\n", my_rank, status.MPI_TAG);
@@ -263,7 +275,12 @@ int doIHaveResultsFromAllProcesses() {
 
 // deal with MSG_FINISH tag
 int processFinish(void) {
+    int dump;
+    MPI_Status status;
     if (my_rank == 0) {
+        receiveSolution();
+        // TODO zparsuj finish
+        // TODO zapis do pole vysledku
         if (doIHaveResultsFromAllProcesses()) {
             // TODO free memory
             /* Free global structures */
@@ -274,9 +291,12 @@ int processFinish(void) {
             MPI_Finalize();
             return 1;
         } else {
+
             return 0;
         }
     } else {
+        // receive so it's not stuck in queue
+        MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
         sendResultsToP0(); // TODO blocking!
         sendFinishToNeighbour(my_rank, p_cnt);
         // TODO free memory
