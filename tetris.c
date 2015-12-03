@@ -455,6 +455,27 @@ void computeScore() {
     }
 }
 
+void printMap(char ** map) {
+    int x,y;
+    for (x = 0; x < WIDTH*4; x++) {
+        printf("=");
+    }
+    printf("\n");
+    for (y = 0; y < HEIGHT; y++) {
+        for (x = 0; x < WIDTH; x++) {
+            if (map[x][y] < 2) {
+                printf("|  |");
+            } else {
+                printf(map[x][y] > 9 ? "|%d|" : "| %d|", map[x][y]);
+            }
+        }
+        printf("\n");
+    }
+    for (x = 0; x < WIDTH*4; x++) {
+        printf("=");
+    }
+    printf("\n");
+}
 
 char ** newMap() {
     int i;
@@ -486,5 +507,14 @@ void copyMap(char ** dest, char ** source) {
 
     for (i = 0; i < WIDTH; i++) {
         memcpy(dest[i], source[i], HEIGHT);
+    }
+}
+
+void copyMapToIntArray(int * dest, char ** source) {
+    int i, j;
+    for(i = 0; i < WIDTH; i++) {
+        for(j = 0; j < HEIGHT; j++) {
+            dest[i*WIDTH+j] = (int)source[i][j];
+        }
     }
 }

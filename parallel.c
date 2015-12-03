@@ -102,7 +102,7 @@ void parallelInit(int my_rank) {
                 break;
             case MSG_WORK_SENT:
                 printf("RANK=%d received token %d\n", my_rank, message);
-                createStackAndMapFromReceived(dataArray);
+                createStackAndMapFromReceived(dataArray, dataLength);
                 break;
             default:
                 //TODO ERROR

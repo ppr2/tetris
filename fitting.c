@@ -272,24 +272,3 @@ void fit(State * state, Shape newValue) {
         //printMap(map);
     }
 }
-void printMap(char ** map) {
-    int x,y;
-    for (x = 0; x < WIDTH*4; x++) {
-        printf("=");
-    }
-    printf("\n");
-    for (y = 0; y < HEIGHT; y++) {
-        for (x = 0; x < WIDTH; x++) {
-            if (map[x][y] < 2) {
-                printf("|  |");
-            } else {
-                printf(map[x][y] > 9 ? "|%d|" : "| %d|", map[x][y]);
-            }
-        }
-        printf("\n");
-    }
-    for (x = 0; x < WIDTH*4; x++) {
-        printf("=");
-    }
-    printf("\n");
-}

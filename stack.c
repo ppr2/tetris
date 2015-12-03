@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
+#include "tetris.h"
 
 #define NULL_NODE (Node *)0
 
@@ -38,6 +39,7 @@ Node *stackPeek(void){
 void stackDeleteTop(void){
     if(stackTop==NULL_NODE){return;}
     Node *previous = stackTop->previous;
+    free(stackTop->state);
     freeNode(stackTop);
     stackTop = previous;
     if(stackTop != NULL_NODE){
@@ -91,6 +93,8 @@ int isStackSplittable(void){
 
 /*
  * Split the stack with D-ADZ method (half at the bottom)
+ * Take unpopped nodes from bottom to last unpopped, split in half,
+ * save to **states and repair stack
  */
 int stackSplit(State **states, int half) {
     if(!isStackSplittable()) return 0;
@@ -154,19 +158,56 @@ int isStackEmpty(){
 }
 
 void freeNode(Node *node){
-    free(node->state);
     free(node);
 }
 
-
 int getArrayFromStackAndMap(int **arr, State *states, int statesCount){
-    // TODO put map for the stack part at the begining. free new map pointer here
-    // udelat to tak, aby se nody serializovaly ve spravnem poradi
-    // taky udelat (int) state->shape
     if(statesCount <= 0){return 0;}
-    //TODO
+    int stateLen = 3, i;
+    int mapLen = WIDTH * HEIGHT;
+    int size = mapLen + stateLen * statesCount;
+
+    // Get serialized map
+    int * mapToSerialize = newMap();
+    int * statesToSerialize = (int*)malloc(stateLen*statesCount);
+    copyMapToIntArray(mapToSerialize, map);
+
+    // Get serialized states
+    int counter = 0, *counter_p = (int*)&counter;
+    for(i=0;i<statesCount;i++){
+        getArrayFromState(statesToSerialize, state, counter_p);
+    }
+
+    // Save to arr
+    for(i=0;i<mapLen;i++){
+        arr[i] = mapToSerialize[i];
+    }
+    for(i=0;i<size-mapLen;i++){
+        arr[mapLen+i] = statesToSerialize[i];
+    }
+
+    return size;
 }
 
-void createStackAndMapFromReceived(int *arr) {
-    // vytvor nody z arr, musi byt poporade a nesmi byt branched
+void createStackAndMapFromReceived(int *arr, int dataLength) {
+    int stateLen = 3;
+    int mapLen = WIDTH * HEIGHT;
+    int i,j, counter = 0;
+
+    // Init stack
+    stackTop = NULL_NODE;
+    stackBottom = NULL_NODE;
+
+    // Parse & create map
+    map = newMap();
+    for(i=0;i<WIDTH;i++){
+        for(j=0;j<HEIGHT;j++){
+            map[i][j] = arr[counter];
+            counter++;
+        }
+    }
+    // Parse & push states
+    while(counter < dataLength) {
+        stackPushState(getStateFromArray(arr, (*int)&counter));
+    }
 }

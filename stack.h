@@ -2,6 +2,11 @@
 #define TETRIS_STACK_H
 
 #include "state.h"
+#include "tetris.h"
+
+extern int WIDTH, HEIGHT;
+extern char ** map;
+
 typedef struct{
     State *state;
     int isBranched;

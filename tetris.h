@@ -3,9 +3,11 @@
 
 #include "state.h"
 
+void printMap(char ** map);
 inline char ** newMap();
 inline void freeMap(char **);
 inline void copyMap(char ** dest, char ** source);
+void copyMapToIntArray(int * dest, char ** source);
 inline int isLeaf(State *);
 void branchFrom(State *);
 void computeScore();

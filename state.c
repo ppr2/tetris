@@ -14,18 +14,16 @@ State* newState(int index, Shape shape, int depth) {
     return state;
 }
 
-void getArrayFromState(int *arr, State *state, int index){
-    int i = index;
-
-    arr[i++] = state->index;
-    arr[i++] = state->shape;
-    arr[i++] = state->depth;
+void getArrayFromState(int *arr, State *state, int *index){
+    arr[(*index)++] = state->index;
+    arr[(*index)++] = (int)state->shape;
+    arr[(*index)++] = state->depth;
 }
 
 State getStateFromArray(int *arr, int *index){
     int i = *index;
 
-    int sindex = arr[i++];
+    int index = arr[i++];
     Shape shape = (Shape)arr[i++];
     int depth = arr[i++];
 
