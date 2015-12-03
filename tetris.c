@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "stack.h"
-#include "fitting.h"
-#include <limits.h>
-#include "parallel.h"
-#include <mpi.h>
-
+#include "tetris.h"
 
 /************************************************
  * LOCAL FUNCTIONS
@@ -19,8 +11,8 @@ void branchFrom(State *);
 void computeScore(void);
 void branchIfYouCan(void);
 void parseInnerMessages(void);
-int processFinish(void);
 void branchUntilStackSizeIsBigEnoughToSplit(void); // used in parallelInit
+int processFinish(int sourceRank);
 
 /************************************************
  * GLOBAL VARIABLES
@@ -36,6 +28,7 @@ int HEIGHT = 5;//= _HEIGHT;
 int DEBUG  = 0;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
 const int INDEX_MAX = _INDEX_MAX;
+int workRequested; // 0/1 whether work was requested
 
 char ** map;
 
@@ -52,7 +45,6 @@ int p_cnt;         // processor count
 int my_rank;       // rank of this process
 int p_index;       // index of work giving process
 int workRequested; // 0/1 whether work was requested
-int shouldFinish;
 
 #define MSG_WORK_REQUEST 1000
 #define MSG_WORK_BATCH    1001
@@ -68,13 +60,12 @@ int main(int argc, char** argv) {
 
     // P0 only
     token_sent = 0;
-    shouldFinish = 0;
 
     MPI_Init( &argc, &argv );
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &p_cnt);
     map = newMap();
-    results = (int) calloc(p_cnt, sizeof(int));
+    results = (int*) calloc(p_cnt, sizeof(int));
 
     parallelInit(my_rank);
 
@@ -84,11 +75,6 @@ int main(int argc, char** argv) {
     while (1) {
         branchIfYouCan();
 
-        if (shouldFinish) {
-            if (processFinish()) {
-                exit(0);
-            }
-        }
         // Is there any process I haven't asked for work yet?
         if (!workRequested && p_index < p_cnt) {
             // request work from process p_index
@@ -215,7 +201,7 @@ void parseOuterMessages(void) {
                 workRequested = 0;
                 break;
             case MSG_FINISH:
-                if (processFinish()) {
+                if (processFinish(status.MPI_SOURCE)) {
                     exit(0);
                 }
                 break;
@@ -252,12 +238,6 @@ void parseInnerMessages(void) {
                 // P0 asked for token, respond black. I'm not done yet
                 sendTokenToNeighbour(TOKEN_BLACK, my_rank, p_cnt);
                 break;
-            case MSG_FINISH:
-                // receive so it's not stuck in queue
-                MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
-                // don't ask for another work
-                shouldFinish = 1;
-                break;
             default:
                 printf("[R-%d] Invalid MPI tag: %d\n", my_rank, status.MPI_TAG);
         }
@@ -274,11 +254,11 @@ int doIHaveResultsFromAllProcesses() {
 }
 
 // deal with MSG_FINISH tag
-int processFinish(void) {
+int processFinish(int sourceRank) {
     int dump;
     MPI_Status status;
     if (my_rank == 0) {
-        receiveSolution();
+        receiveSolution(sourceRank);
         if (doIHaveResultsFromAllProcesses()) {
             // TODO free memory
             /* Free global structures */

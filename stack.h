@@ -3,6 +3,8 @@
 
 #include "state.h"
 #include "tetris.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 extern int WIDTH, HEIGHT;
 extern char ** map;
@@ -31,5 +33,6 @@ void freeNode(Node *node);
 
 int getArrayFromStackAndMap(int **arr, State *states, int statesCount);
 void createStackAndMapFromReceived(int *arr, int dataLength);
+void waitForUnfinishedSending(void);
 
 #endif

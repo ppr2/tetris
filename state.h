@@ -1,6 +1,9 @@
 #ifndef TETRIS_STATE_H
 #define TETRIS_STATE_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /************************************************
  * TYPES DEFINITIONS
  ************************************************/

@@ -1,8 +1,9 @@
 #ifndef TETRIS_FITTING_H
 #define TETRIS_FITTING_H
-#define MAX_HEIGHT 10
 
 #include "state.h"
+#include <stdio.h>
+
 extern char ** map;
 extern int WIDTH;
 extern int HEIGHT;

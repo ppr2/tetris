@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "stack.h"
 
 #define NULL_NODE (Node *)0
@@ -190,8 +188,6 @@ int getArrayFromStackAndMap(int **arr, State *states, int statesCount){
 }
 
 void createStackAndMapFromReceived(int *arr, int dataLength) {
-    int stateLen = 3;
-    int mapLen = WIDTH * HEIGHT;
     int i,j, counter = 0;
 
     // Init stack

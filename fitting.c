@@ -1,6 +1,4 @@
 #include "fitting.h"
-#include "state.h"
-#include <stdio.h>
 
 
 /*

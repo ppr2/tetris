@@ -15,26 +15,29 @@ stack_test: stack_test.o stack.o state.o
 
 all: tetris
 
-tetris: tetris.o fitting.o ${STRUCTURES}
-	mpicc -Wall -o tetris tetris.o fitting.o ${STRUCTURES}
+tetris: tetris.o fitting.o parallel.o ${STRUCTURES}
+	mpicc -Wall -o tetris tetris.o fitting.o parallel.o ${STRUCTURES}
 
 tetris.o: tetris.c stack.h state.h fitting.h
-	mpicc -c -Wall tetris.c
+	mpicc -c -Wall -std=c99 tetris.c
 
 fitting_test.o: tests/fitting_test.c tests/fitting_test.h fitting.h
-	mpicc -c -Wall tests/fitting_test.c
+	mpicc -c -Wall -std=c99 tests/fitting_test.c
 
 stack_test.o: tests/stack_test.c tests/stack_test.h stack.h state.h
-	mpicc -c -Wall tests/stack_test.c
+	mpicc -c -Wall -std=c99 tests/stack_test.c
 
 fitting.o: fitting.c fitting.h
-	mpicc -c -Wall fitting.c
+	mpicc -c -Wall -std=c99 fitting.c
 
 state.o: state.c state.h
-	mpicc -c -Wall state.c
+	mpicc -c -Wall -std=c99 state.c
 
 stack.o: stack.c stack.h
-	mpicc -c -Wall stack.c
+	mpicc -c -Wall -std=c99 stack.c
+
+parallel.o: parallel.c parallel.h
+	mpicc -c -Wall -std=c99 parallel.c
 
 clean:
 	rm -f tetris fitting_test stack_test *.o

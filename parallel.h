@@ -1,18 +1,24 @@
 #ifndef TETRIS_PARALLEL_H
 #define TETRIS_PARALLEL_H
 
+#include "stack.h"
+#include "state.h"
+#include <mpi.h>
+
 extern int token_sent;
 extern char ** bestMap;
 extern long double bestScore;
 extern int *results;
+extern int workRequested; // 0/1 whether work was requested
 
 void parallelInit(int);
 
 void sendNoWork(int requester);
 void sendWork(int p_recipient, int half);
 void requestWork(int);
-int processIncomingWork(int workSource);
-void receiveSolution(void);
+void processIncomingWork(int workSource);
+void receiveSolution(int sender);
+void transmitSolution();
 
 void processToken(int my_rank, int p_cnt);
 void sendTokenToNeighbour(int token, int my_rank, int p_cnt);
