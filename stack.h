@@ -8,6 +8,7 @@
 
 extern int WIDTH, HEIGHT;
 extern char ** map;
+extern int my_rank;
 
 typedef struct{
     State *state;

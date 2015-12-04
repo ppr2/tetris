@@ -3,9 +3,12 @@
 
 #include "stack.h"
 #include "state.h"
+#include "tetris.h"
 #include <mpi.h>
 
 extern int token_sent;
+extern int my_rank, p_cnt;
+extern int DEBUG_PARALLEL;
 extern char ** bestMap;
 extern long double bestScore;
 extern int *results;

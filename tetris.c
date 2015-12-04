@@ -26,6 +26,7 @@ int processFinish(int sourceRank);
 int WIDTH  = 4;//= _WIDTH;
 int HEIGHT = 5;//= _HEIGHT;
 int DEBUG  = 0;//= _DEBUG;
+int DEBUG_PARALLEL  = 1;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
 const int INDEX_MAX = _INDEX_MAX;
 int workRequested; // 0/1 whether work was requested
@@ -61,14 +62,13 @@ int main(int argc, char** argv) {
     // P0 only
     token_sent = 0;
 
-    MPI_Init( &argc, &argv );
+    MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &p_cnt);
     map = newMap();
     results = (int*) calloc(p_cnt, sizeof(int));
 
     parallelInit(my_rank);
-
 
     p_index = 0;        // index of work giver
     workRequested = 0; // is this process waiting for more work?
@@ -99,17 +99,19 @@ int main(int argc, char** argv) {
         printf("score -> %Lf\n", bestScore);
         printf("\n");
     }
+    return EXIT_SUCCESS;
 }
 
 
 void branchUntilStackSizeIsBigEnoughToSplit(void) {
+    if(DEBUG_PARALLEL){printf("---(%d) Branching until stack size is big enough to split \n", my_rank);}
     /* Init */
     Node *currentNode;
     State *currentState;
     stackPushState(newState(0, EMPTY, 0));
 
     /* Main cycle */
-    while (!isStackEmpty() || stackSize() < p_cnt + 1) {
+    while (!isStackEmpty() && stackSize() < p_cnt + 1) {
         currentNode = stackPeek();
         currentState = currentNode->state;
 
@@ -140,6 +142,8 @@ void branchUntilStackSizeIsBigEnoughToSplit(void) {
 }
 
 void branchIfYouCan(void) {
+    if(DEBUG_PARALLEL){printf("---(%d) Branching if I can \n", my_rank);}
+    if(DEBUG_PARALLEL){stackPrintOutCompact();}
     /* Init */
     Node *currentNode;
     State *currentState;
@@ -190,22 +194,26 @@ void parseOuterMessages(void) {
     if (msg_arrived) {
         switch (status.MPI_TAG) {
             case MSG_WORK_BATCH:
+                if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_WORK_BATCH \n", my_rank);}
                 processIncomingWork(status.MPI_SOURCE);
                 p_index = 0; // reset index of work giver
                 workRequested = 0;
                 break;
             case MSG_WORK_NOWORK:
+                if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_WORK_NOWORK \n", my_rank);}
                 // receive so it's not stuck in queue
                 MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
                 p_index++;   // ask another process next round
                 workRequested = 0;
                 break;
             case MSG_FINISH:
+                if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_FINISH \n", my_rank);}
                 if (processFinish(status.MPI_SOURCE)) {
                     exit(0);
                 }
                 break;
             case MSG_TOKEN:
+                if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_TOKEN \n", my_rank);}
                 // receive so it's not stuck in queue
                 MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
                 processToken(my_rank, p_cnt);

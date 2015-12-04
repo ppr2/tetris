@@ -72,10 +72,11 @@ void sendFinishToNeighbour(int my_rank, int p_cnt) {
 }
 
 void parallelInit(int my_rank) {
+    if(DEBUG_PARALLEL){printf("---(%d) Parallel init \n", my_rank);}
 
     if (my_rank == 0) {
         branchUntilStackSizeIsBigEnoughToSplit();
-        for (int p_i = 1; p_i < stackSize() - 1; p_i++) {
+        for (int p_i = 1; p_i < stackSize() - 1 && p_i < p_cnt; p_i++) {
             sendWork(p_i, 0); // Send one node to p_i
         }
     } else {
@@ -83,7 +84,7 @@ void parallelInit(int my_rank) {
         int flag;
         MPI_Status status;
 
-        printf("RANK=%d waiting for msg\n", my_rank);
+        if(DEBUG_PARALLEL){printf("---(%d) waiting for msg\n", my_rank);}
         // Wait for initial message, can receive MSG_FINISH or MSG_TOKEN
         do {
             MPI_Iprobe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &status);
@@ -94,10 +95,11 @@ void parallelInit(int my_rank) {
 
         switch (status.MPI_TAG) {
             case MSG_FINISH:
-                printf("RANK=%d received finish\n", my_rank);
+                if(DEBUG_PARALLEL){printf("---(%d) received finish\n", my_rank);}
                 MPI_Finalize();
                 exit(0);
             case MSG_WORK_BATCH:
+                if(DEBUG_PARALLEL){printf("---(%d) received work_batch\n", my_rank);}
                 createStackAndMapFromReceived(dataArray, dataLength);
                 break;
             default:
@@ -125,12 +127,14 @@ void sendNoWork(int requester) {
  * half - send half of stack row (1) or just one element and its subtree (0)?
  */
 void sendWork(int p_recipient, int half) {
+    if(DEBUG_PARALLEL){printf("---(%d) Sending work to %d \n", my_rank, p_recipient);}
     /* Get states from stack cutting */
     State *states;
     int statesCount = stackSplit(&states, half);
     int dataArray[statesCount*3 + WIDTH*HEIGHT]; // *3 because state consists of 3 integers
     /* Serialize the states to array, save that to dataArray */
     int *p_dataArray = &dataArray[0];
+    if(DEBUG_PARALLEL){printf("---(%d) Serializing array from stack and map\n", my_rank);}
     int statesDataSize = getArrayFromStackAndMap(&p_dataArray, states, statesCount);
 
     waitForUnfinishedSending();

@@ -72,16 +72,12 @@ State *stackPushStateWithPoppedInfo(State* currentState, int isBranched){
 }
 
 int isStackSplittable(void){
-    if(isStackEmpty()){
-        //printf("(%d) Stack is empty.\n", rank);
-        return 0;
-    }
+    if(isStackEmpty()){return 0;}
 
     Node *node = stackBottom;
     while(node->isBranched){
         node = node->next;
         if(node == NULL_NODE){
-            //printf("(%d) Stack contains only branched nodes.\n", rank);
             return 0;
         }
     }
@@ -94,13 +90,14 @@ int isStackSplittable(void){
  * save to **states and repair stack
  */
 int stackSplit(State **states, int half) {
-    if(!isStackSplittable()) return 0;
+    if(!isStackSplittable()) {return 0;}
+    if(DEBUG_PARALLEL){printf("---(%d) Splitting stack \n", my_rank); stackPrintOutCompact();}
 
     Node *node = stackBottom;
     while(node->isBranched){
         node = node->next;
         if(node == NULL_NODE){
-            //printf("(%d) Stack contains only branched nodes.\n", rank);
+            printf("---(%d) Stack contains only branched nodes.\n", my_rank);
             return 0;
         }
     }
@@ -117,10 +114,7 @@ int stackSplit(State **states, int half) {
     int nodesToCutCount = half ? (cuttableNodeCount + 1) / 2 : 1;
     if (cuttableNodeCount > 0 && nodesToCutCount > 0) {
         *states = (State *)malloc(nodesToCutCount * sizeof(State));
-        if(*states == NULL){
-            printf("Out of memory during stack cutting!");
-            exit(EXIT_FAILURE);
-        }
+        if(*states == NULL){printf("---(%d) Out of mem while cutting stack.", my_rank); exit(EXIT_FAILURE);}
 
         Node *firstUncutNode = node;
         node = node->previous;
