@@ -196,7 +196,7 @@ void parseOuterMessages(void) {
     MPI_Status status;
     int msg_arrived, dump;
 
-    printf("---(%d) Probing since I've got nothing to do\n", my_rank);
+    printf("---(%d) Probing p_index=%d\n", my_rank, p_index);
     MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
     if (msg_arrived) {
         printf("---(%d) Message arrived! MSG_TAG=%d from %d\n", my_rank, status.MPI_TAG, status.MPI_SOURCE);
@@ -227,6 +227,8 @@ void parseOuterMessages(void) {
                 processToken(my_rank, p_cnt);
                 break;
             case MSG_WORK_REQUEST:
+                if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_WORK_REQUEST \n", my_rank);}
+                MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
                 sendNoWork(status.MPI_SOURCE);
                 break;
             default:

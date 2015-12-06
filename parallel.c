@@ -1,7 +1,7 @@
 #include "parallel.h"
 
 #define MSG_WORK_REQUEST 1000
-#define MSG_WORK_BATCH    1001
+#define MSG_WORK_BATCH   1001
 #define MSG_WORK_NOWORK  1002
 #define MSG_TOKEN        1003
 #define MSG_FINISH       1004
@@ -153,6 +153,7 @@ void sendWork(int p_recipient, int half) {
 void requestWork(int workSenderRank) {
     int emptyBuffer = 0;
 
+    printf("---(%d) Requesting work from p%d\n", my_rank, workSenderRank);
     /* Send the work request */
     MPI_Send(&emptyBuffer, 1, MPI_INT, workSenderRank, MSG_WORK_REQUEST, MPI_COMM_WORLD);
 }
