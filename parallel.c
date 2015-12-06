@@ -65,7 +65,6 @@ void parallelInit(int my_rank) {
     }
 }
 
-
 void processToken(int my_rank, int p_cnt) {
     MPI_Status status;
     int token;
