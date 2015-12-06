@@ -31,7 +31,7 @@ int isStackEmpty();
 
 void freeNode(Node *node);
 
-int getArrayFromStackAndMap(int **arr, State *states, int statesCount);
+int getArrayFromStackAndMap(int *arr, State *states, int statesCount);
 void createStackAndMapFromReceived(int *arr, int dataLength);
 void waitForUnfinishedSending(void);
 
