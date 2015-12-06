@@ -22,6 +22,50 @@ int solutionSent = 0;
 MPI_Request *solutionRequests;
 int *solutionArray;
 
+void parallelInit(int my_rank) {
+    //if(DEBUG_PARALLEL){printf("---(%d) Parallel init \n", my_rank);}
+
+    if (my_rank == 0) {
+        branchUntilStackSizeIsBigEnoughToSplit();
+        for (int p_i = 1; p_i < p_cnt; p_i++) {
+            //printf("SENDING WORK TO %d\n", p_i);
+            sendWork(p_i, 0); // Send one node to p_i
+            //printf("WORK SENT TO %d\n", p_i);
+        }
+    } else {
+        int dataLength;
+        int flag;
+        MPI_Status status;
+
+        if(DEBUG_PARALLEL){printf("---(%d) Waiting for MSG\n", my_rank);}
+        // Wait for initial message, can receive MSG_FINISH or MSG_TOKEN
+        do {
+            MPI_Iprobe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &status);
+        } while (!flag);
+        MPI_Get_count(&status, MPI_INT, &dataLength);
+        int dataArray[dataLength];
+        MPI_Recv(&dataArray, dataLength, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+        switch (status.MPI_TAG) {
+            case MSG_FINISH:
+                if(DEBUG_PARALLEL){printf("---(%d) received finish\n", my_rank);}
+                MPI_Finalize();
+                exit(0);
+            case MSG_WORK_BATCH:
+                if(DEBUG_PARALLEL){printf("---(%d) received work_batch\n", my_rank);}
+                createStackAndMapFromReceived(dataArray, dataLength);
+                //if(DEBUG_PARALLEL){printf("---(%d) Incoming serialized array: ,[", my_rank); for(int i=0;i<dataLength;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();printMap(map);}
+                break;
+            default:
+                //TODO ERROR
+                printf("error aaaaaaaaaaaaaaaaaaaa\n");
+                MPI_Finalize();
+                exit(1);
+        }
+    }
+}
+
+
 void processToken(int my_rank, int p_cnt) {
     MPI_Status status;
     int token;
@@ -60,48 +104,6 @@ void sendFinishToNeighbour(int my_rank, int p_cnt) {
     MPI_Send(&emptyBuffer, 1, MPI_INT, neighbourRank, MSG_FINISH, MPI_COMM_WORLD);
 }
 
-void parallelInit(int my_rank) {
-    if(DEBUG_PARALLEL){printf("---(%d) Parallel init \n", my_rank);}
-
-    if (my_rank == 0) {
-        branchUntilStackSizeIsBigEnoughToSplit();
-        for (int p_i = 1; p_i < stackSize() - 1 && p_i < p_cnt; p_i++) {
-            sendWork(p_i, 0); // Send one node to p_i
-        }
-    } else {
-        int dataLength;
-        int flag;
-        MPI_Status status;
-
-        if(DEBUG_PARALLEL){printf("---(%d) Waiting for MSG\n", my_rank);}
-        // Wait for initial message, can receive MSG_FINISH or MSG_TOKEN
-        do {
-            MPI_Iprobe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &status);
-        } while (!flag);
-        MPI_Get_count(&status, MPI_INT, &dataLength);
-        int dataArray[dataLength];
-        MPI_Recv(&dataArray, dataLength, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-
-        switch (status.MPI_TAG) {
-            case MSG_FINISH:
-                if(DEBUG_PARALLEL){printf("---(%d) received finish\n", my_rank);}
-                MPI_Finalize();
-                exit(0);
-            case MSG_WORK_BATCH:
-                if(DEBUG_PARALLEL){printf("---(%d) received work_batch\n", my_rank);}
-                createStackAndMapFromReceived(dataArray, dataLength);
-                if(DEBUG_PARALLEL){printf("---(%d) Incoming serialized array: ,[", my_rank); for(int i=0;i<dataLength;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();printMap(map);}
-                exit(1);
-                break;
-            default:
-                //TODO ERROR
-                printf("error aaaaaaaaaaaaaaaaaaaa\n");
-                MPI_Finalize();
-                exit(1);
-        }
-    }
-}
-
 /************************************************
  * WORK functions
  ************************************************/
@@ -134,7 +136,6 @@ void sendWork(int p_recipient, int half) {
     /* Send states array to p_recipient */
     MPI_Isend(&dataArray, statesDataSize, MPI_INT, p_recipient, MSG_WORK_BATCH, MPI_COMM_WORLD, &request);
     MPI_Wait(&request, &status);
-
     /* Free up memory if I sent something */
     if(statesCount > 0) {
         // Free states
@@ -142,7 +143,7 @@ void sendWork(int p_recipient, int half) {
             free(&states[i]);
         }
         // Free states pointer
-        free(states);
+        //free(states);
     }
 }
 

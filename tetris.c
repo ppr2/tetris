@@ -23,8 +23,8 @@ int processFinish(int sourceRank);
 #define _HEIGHT 3
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
-int WIDTH  = 3;//= _WIDTH;
-int HEIGHT = 3;//= _HEIGHT;
+int WIDTH  = 4;//= _WIDTH;
+int HEIGHT = 4;//= _HEIGHT;
 int DEBUG  = 0;//= _DEBUG;
 int DEBUG_PARALLEL  = 1;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
@@ -70,9 +70,12 @@ int main(int argc, char** argv) {
 
     parallelInit(my_rank);
 
+    if(DEBUG_PARALLEL){printf("---(%d) Initialized\n", my_rank);}
     p_index = 0;        // index of work giver
     workRequested = 0; // is this process waiting for more work?
+    int debug_index = 0;
     while (1) {
+        if (debug_index > 3) exit(1);
         branchIfYouCan();
 
         // Is there any process I haven't asked for work yet?
@@ -87,6 +90,7 @@ int main(int argc, char** argv) {
             token_sent = 1;
         }
         parseOuterMessages();
+        debug_index++;
     }
       
       
@@ -142,7 +146,7 @@ void branchUntilStackSizeIsBigEnoughToSplit(void) {
 }
 
 void branchIfYouCan(void) {
-    if(DEBUG_PARALLEL){printf("---(%d) Branching if I can \n", my_rank);}
+    if(DEBUG_PARALLEL){printf("---(%d) Branching 'cause I can!\n", my_rank);}
     if(DEBUG_PARALLEL){stackPrintOutCompact();}
     /* Init */
     Node *currentNode;

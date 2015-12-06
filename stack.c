@@ -20,8 +20,8 @@ void stackPrintOut(void){
 }
 
 void stackPrintOutCompact(void){
-    if(isStackEmpty()){printf("\nStack is empty.\n"); return;}
-    printf("---> Stack contents (index,shape)\n");
+    if(isStackEmpty()){printf("\n---(%d) Stack is empty.\n", my_rank); return;}
+    printf("---(%d) Stack contents (index,shape,depth)\n---(%d) ", my_rank, my_rank);
     Node *node = stackBottom;
     while(node != NULL_NODE){
         printf("(%d,%d,d%d),", node->state->index, node->state->shape, node->state->depth);
@@ -92,7 +92,7 @@ int isStackSplittable(void){
  */
 int stackSplit(State **states, int half) {
     if(!isStackSplittable()) {return 0;}
-    if(DEBUG_PARALLEL){printf("---(%d) Splitting stack \n", my_rank); stackPrintOutCompact();}
+    //if(DEBUG_PARALLEL){printf("---(%d) Splitting stack \n", my_rank); stackPrintOutCompact();}
 
     Node *node = stackBottom;
     while(node->isBranched){
@@ -115,7 +115,7 @@ int stackSplit(State **states, int half) {
             cuttableNodeCount++;
         }
     }
-    if(DEBUG_PARALLEL){printf("---(%d) Beginning stack split at (%d,%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
+    //if(DEBUG_PARALLEL){printf("---(%d) Beginning stack split at (%d,%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
 
     // Cut in half (+1)
     int nodesToCutCount = half ? (cuttableNodeCount + 1) / 2 : 1;
@@ -150,7 +150,7 @@ int stackSplit(State **states, int half) {
             firstUncutNode->previous = node;
         }
 
-        if(DEBUG_PARALLEL){printf("---(%d) Finishing stack split at (%d,%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
+        //if(DEBUG_PARALLEL){printf("---(%d) Finishing stack split at (%d,%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
         return nodesToCutCount;
     }
     return 0;
@@ -197,7 +197,7 @@ int getArrayFromStackAndMap(int *arr, State *states, int statesCount){
     return size;
 }
 
-void createStackAndMapFromReceived(int *arr, int dataLength) {
+void createStackAndMapFromReceived(int *data, int dataLength) {
     int i,j, counter = 0;
 
     // Init stack
@@ -206,21 +206,17 @@ void createStackAndMapFromReceived(int *arr, int dataLength) {
     size = 0;
 
     // Parse & create map
-    map = newMap();
+    //map = newMap(); alokuje se uz tetris.c - main()
     for(i=0;i<WIDTH;i++){
         for(j=0;j<HEIGHT;j++){
-            map[i][j] = (char) arr[counter];
+            map[i][j] = (char) data[counter];
             counter++;
         }
     }
     // Parse & push states
     while(counter < dataLength) {
-        State s = getStateFromArray(arr, &counter);
-        State * s_p = &s;
-        printf("asd1");
-        stackPrintOutCompact();
-        stackPushState(s_p);
-        printf("asd2");
-        stackPrintOutCompact();
+        State * s = newState(data[counter], (Shape) data[counter+1], data[counter+2]);
+        counter += 3;
+        stackPushState(s);
     }
 }
