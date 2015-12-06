@@ -10,7 +10,6 @@
 #include <string.h>
 #include <limits.h>
 #include <mpi.h>
-#include <unistd.h>
 
 void printMap(char ** map);
 char ** newMap();

@@ -9,8 +9,6 @@
 #define TOKEN_BLACK 1
 #define TOKEN_WHITE 0
 
-#define MAX_MSG_LENGTH (WIDTH*HEIGHT*20)/2
-
 /************************************************
  * INIT
  ************************************************/
@@ -127,21 +125,21 @@ void sendWork(int p_recipient, int half) {
     /* Serialize the states to array, save that to dataArray */
     if(DEBUG_PARALLEL){printf("---(%d) Serializing array from stack and map, #states=%d\n", my_rank, statesCount);}
     int statesDataSize = getArrayFromStackAndMap(dataArray, states, statesCount);
-    if(DEBUG_PARALLEL){printf("---(%d) Serialized array to send: ,[", my_rank); for(int i=0;i<statesDataSize;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();}
+    if(DEBUG_PARALLEL){printf("---(%d) Serialized array to send (length=%d): ,[", my_rank, statesDataSize); for(int i=0;i<statesDataSize;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();}
 
 
     /* Send states array to p_recipient */
     MPI_Isend(&dataArray, statesDataSize, MPI_INT, p_recipient, MSG_WORK_BATCH, MPI_COMM_WORLD, &request);
     MPI_Wait(&request, &status);
     /* Free up memory if I sent something */
-    if(statesCount > 0) {
+/*    if(statesCount > 0) {
         // Free states
         for(int i = 0; i < statesCount; i++) {
             free(&states[i]);
         }
         // Free states pointer
         //free(states);
-    }
+    }*/
 }
 
 /**
@@ -159,12 +157,13 @@ void requestWork(int workSenderRank) {
 /**
  * Work on incoming work, which we have requested
  */
-void processIncomingWork(int workSource) {
+void processIncomingWork(MPI_Status status) {
+    int workSource = status.MPI_SOURCE;
     if(DEBUG_PARALLEL){printf("---(%d) Processing incoming work from p_%d\n", my_rank, workSource);}
     /* Get incoming message */
     int receivedDataSize;
-    MPI_Status status;
     MPI_Get_count(&status, MPI_INT, &receivedDataSize);
+    if(DEBUG_PARALLEL){printf("---(%d) Data length=%d from p_%d\n", my_rank, receivedDataSize, workSource);}
     int receivedData[receivedDataSize];
 
     // Receive
@@ -179,8 +178,7 @@ void receiveSolution(int sender) {
     if(DEBUG_PARALLEL){printf("---(%d) Receiving solution from %d\n", my_rank, sender);}
 
     long double dataArray[dataLength];
-    MPI_Recv(&dataArray, dataLength, MPI_LONG_DOUBLE, sender, MSG_FINISH, MPI_COMM_WORLD, &status);
-    if(DEBUG_PARALLEL){printf("---(%d) Received solution from %d\n", my_rank, sender);}
+    MPI_Recv(dataArray, dataLength, MPI_LONG_DOUBLE, sender, MSG_FINISH, MPI_COMM_WORLD, &status);
 
     if (bestScore > dataArray[0]) {
         int counter = 1;

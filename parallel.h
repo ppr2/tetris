@@ -19,7 +19,7 @@ void parallelInit(int);
 void sendNoWork(int requester);
 void sendWork(int p_recipient, int half);
 void requestWork(int);
-void processIncomingWork(int workSource);
+void processIncomingWork(MPI_Status status);
 void receiveSolution(int sender);
 void transmitSolution();
 

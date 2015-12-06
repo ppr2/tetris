@@ -19,8 +19,8 @@ int processFinish(int sourceRank);
  ************************************************/
 #define _DEBUG 0
 #define _DEBUG_STEPS 0
-#define _WIDTH 4
-#define _HEIGHT 4
+#define _WIDTH 5
+#define _HEIGHT 5
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
 int WIDTH  = _WIDTH;
@@ -77,7 +77,6 @@ int main(int argc, char** argv) {
     while (1) {
         //printf("---(%d) stack size=%d\n", my_rank, stackSize());
         branchIfYouCan();
-        usleep(10000);
         // Is there any process I haven't asked for work yet?
         if (!workRequested && p_index < p_cnt) {
             // request work from process p_index
@@ -193,14 +192,14 @@ void parseOuterMessages(void) {
     MPI_Status status;
     int msg_arrived, dump;
 
-    printf("---(%d) Probing p_index=%d\n", my_rank, p_index);
+    //printf("---(%d) Probing p_index=%d\n", my_rank, p_index);
     MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
     if (msg_arrived) {
         printf("---(%d) Message arrived! MSG_TAG=%d from %d\n", my_rank, status.MPI_TAG, status.MPI_SOURCE);
         switch (status.MPI_TAG) {
             case MSG_WORK_BATCH:
                 if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_WORK_BATCH \n", my_rank);}
-                processIncomingWork(status.MPI_SOURCE);
+                processIncomingWork(status);
                 p_index = 0; // reset index of work giver
                 workRequested = 0;
                 break;
@@ -259,7 +258,8 @@ void parseInnerMessages(void) {
                 sendTokenToNeighbour(TOKEN_BLACK, my_rank, p_cnt);
                 break;
             default:
-                printf("[R-%d] Invalid MPI tag: %d\n", my_rank, status.MPI_TAG);
+                printf("---(%d) Invalid MPI tag: %d\n", my_rank, status.MPI_TAG);
+                exit(1);
         }
     }
 }
@@ -281,14 +281,6 @@ int processFinish(int sourceRank) {
     if (my_rank == 0) {
         receiveSolution(sourceRank);
         if (doIHaveResultsFromAllProcesses()) {
-            // TODO free memory
-            /* Free global structures */
-            freeMap(map);
-            freeMap(bestMap);
-            free(results);
-
-            MPI_Finalize();
-
             /* Results output */
             printf("\n--- RESULTS ---\n");
             if (bestMap == NULL) {
@@ -298,6 +290,13 @@ int processFinish(int sourceRank) {
                 printf("score -> %Lf\n", bestScore);
                 printf("\n");
             }
+
+            /* Free global structures */
+/*            freeMap(map);
+            freeMap(bestMap);
+            free(results);*/
+
+            MPI_Finalize();
             return 0;
         } else {
 
@@ -307,10 +306,9 @@ int processFinish(int sourceRank) {
         MPI_Recv(&dump, 1, MPI_INT, sourceRank, MSG_FINISH, MPI_COMM_WORLD, &status);
         transmitSolution();
         sendFinishToNeighbour(my_rank, p_cnt);
-        // TODO free memory
         /* Free global structures */
-        freeMap(map);
-        freeMap(bestMap);
+/*        freeMap(map);
+        freeMap(bestMap);*/
 
         MPI_Finalize();
         return 1;
