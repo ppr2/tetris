@@ -1,4 +1,5 @@
 #include "stack.h"
+#include "state.h"
 
 #define NULL_NODE (Node *)0
 
@@ -126,8 +127,7 @@ int stackSplit(State **states, int half) {
         if(node->next == NULL_NODE){
             firstUncutNode = NULL_NODE;
         } else {
-            firstUncutNode = node;
-            node = node->previous;
+            firstUncutNode = node->next;
         }
 
         int i;
@@ -203,18 +203,24 @@ void createStackAndMapFromReceived(int *arr, int dataLength) {
     // Init stack
     stackTop = NULL_NODE;
     stackBottom = NULL_NODE;
+    size = 0;
 
     // Parse & create map
     map = newMap();
     for(i=0;i<WIDTH;i++){
         for(j=0;j<HEIGHT;j++){
-            map[i][j] = (char) *(arr+counter);
+            map[i][j] = (char) arr[counter];
             counter++;
         }
     }
     // Parse & push states
     while(counter < dataLength) {
         State s = getStateFromArray(arr, &counter);
-        stackPushState(&s);
+        State * s_p = &s;
+        printf("asd1");
+        stackPrintOutCompact();
+        stackPushState(s_p);
+        printf("asd2");
+        stackPrintOutCompact();
     }
 }

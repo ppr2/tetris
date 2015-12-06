@@ -20,11 +20,11 @@ int processFinish(int sourceRank);
 #define _DEBUG 0
 #define _DEBUG_STEPS 0
 #define _WIDTH 3
-#define _HEIGHT 4
+#define _HEIGHT 3
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
 int WIDTH  = 3;//= _WIDTH;
-int HEIGHT = 4;//= _HEIGHT;
+int HEIGHT = 3;//= _HEIGHT;
 int DEBUG  = 0;//= _DEBUG;
 int DEBUG_PARALLEL  = 1;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
@@ -236,6 +236,7 @@ void parseInnerMessages(void) {
         switch (status.MPI_TAG) {
             case MSG_WORK_REQUEST:
                 // Someone asked for work - send part of stack/NO_WORK
+                if(DEBUG_PARALLEL){printf("---(%d) Parse Inner Messages -> MSG_WORK_REQUEST \n", my_rank);}
                 if (isStackSplittable()) {
                     sendWork(status.MPI_SOURCE, 1);
                 } else {
@@ -244,6 +245,7 @@ void parseInnerMessages(void) {
                 break;
             case MSG_TOKEN:
                 // P0 asked for token, respond black. I'm not done yet
+                if(DEBUG_PARALLEL){printf("---(%d) Parse Inner Messages -> MSG_TOKEN \n", my_rank);}
                 sendTokenToNeighbour(TOKEN_BLACK, my_rank, p_cnt);
                 break;
             default:

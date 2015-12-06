@@ -90,6 +90,8 @@ void parallelInit(int my_rank) {
             case MSG_WORK_BATCH:
                 if(DEBUG_PARALLEL){printf("---(%d) received work_batch\n", my_rank);}
                 createStackAndMapFromReceived(dataArray, dataLength);
+                if(DEBUG_PARALLEL){printf("---(%d) Incoming serialized array: ,[", my_rank); for(int i=0;i<dataLength;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();printMap(map);}
+                exit(1);
                 break;
             default:
                 //TODO ERROR
@@ -126,7 +128,7 @@ void sendWork(int p_recipient, int half) {
     /* Serialize the states to array, save that to dataArray */
     if(DEBUG_PARALLEL){printf("---(%d) Serializing array from stack and map, #states=%d\n", my_rank, statesCount);}
     int statesDataSize = getArrayFromStackAndMap(dataArray, states, statesCount);
-    if(DEBUG_PARALLEL){printf("---(%d) Serialized array: ,[", my_rank); for(int i=0;i<statesDataSize;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();}
+    if(DEBUG_PARALLEL){printf("---(%d) Serialized array to send: ,[", my_rank); for(int i=0;i<statesDataSize;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();}
 
 
     /* Send states array to p_recipient */
