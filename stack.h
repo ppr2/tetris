@@ -6,9 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int WIDTH, HEIGHT;
+extern int WIDTH, HEIGHT, DEBUG_PARALLEL, my_rank;
 extern char ** map;
-extern int my_rank;
 
 typedef struct{
     State *state;

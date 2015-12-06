@@ -36,8 +36,8 @@ Node *stackPeek(void){
 void stackDeleteTop(void){
     if(stackTop==NULL_NODE){return;}
     Node *previous = stackTop->previous;
-    free(stackTop->state);
-    freeNode(stackTop);
+    //free(stackTop->state);
+    //freeNode(stackTop);
     stackTop = previous;
     if(stackTop != NULL_NODE){
         stackTop->next = NULL_NODE;
@@ -106,15 +106,18 @@ int stackSplit(State **states, int half) {
     int cuttableNodeDepth = node->state->depth;
     int cuttableNodeCount = 0;
     do {
+        if(DEBUG_PARALLEL){printf("---(%d) (i%d,s%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
         cuttableNodeCount++;
         node = node->next;
-    } while(node->state->depth == cuttableNodeDepth && !node->isBranched);
+    } while(node->next != NULL_NODE && node->state->depth == cuttableNodeDepth && !node->isBranched);
+
+    if(DEBUG_PARALLEL){printf("---(%d) beginning stack split at (%d,%d,d%d)\n\n\n\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
 
     // Cut in half (+1)
     int nodesToCutCount = half ? (cuttableNodeCount + 1) / 2 : 1;
     if (cuttableNodeCount > 0 && nodesToCutCount > 0) {
         *states = (State *)malloc(nodesToCutCount * sizeof(State));
-        if(*states == NULL){printf("---(%d) Out of mem while cutting stack.", my_rank); exit(EXIT_FAILURE);}
+        if(*states == NULL){printf("---(%d) Out of mem while cutting stack.\n", my_rank); exit(EXIT_FAILURE);}
 
         Node *firstUncutNode = node;
         node = node->previous;
@@ -127,7 +130,7 @@ int stackSplit(State **states, int half) {
             previous = node->previous;
 
             //TODO free what is to be freed, but allow sending of data
-            freeNode(node);
+            //freeNode(node);
             node = previous;
         }
         size -= nodesToCutCount; // Reduce stack size counter
@@ -135,6 +138,7 @@ int stackSplit(State **states, int half) {
         // Repair stack
         node->next = firstUncutNode;
         firstUncutNode->previous = node;
+        if(DEBUG_PARALLEL){printf("---(%d) finishing stack split at (%d,%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
         return nodesToCutCount;
     }
     return 0;
