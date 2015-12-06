@@ -297,7 +297,7 @@ int processFinish(int sourceRank) {
             free(results);*/
 
             MPI_Finalize();
-            return 0;
+            return 1;
         } else {
 
             return 0;
