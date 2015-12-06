@@ -66,12 +66,7 @@ void parallelInit(int my_rank) {
 }
 
 
-void processToken(int my_rank, int p_cnt) {
-    MPI_Status status;
-    int token;
-
-    MPI_Recv(&token, 1, MPI_INT, MPI_ANY_SOURCE, MSG_TOKEN, MPI_COMM_WORLD, &status);
-
+void processToken(int my_rank, int p_cnt, int token) {
     if (my_rank == 0) {
         // It came through the whole circle
         if (token == TOKEN_WHITE) {
@@ -94,6 +89,7 @@ void processToken(int my_rank, int p_cnt) {
 void sendTokenToNeighbour(int token, int my_rank, int p_cnt) {
     int neighbourRank = my_rank == p_cnt - 1 ? 0 : my_rank + 1;
 
+    if(DEBUG_PARALLEL){printf("---(%d) Sending token %s to neighbour %d\n", my_rank, token ? "TOKEN_BLACK" : "TOKEN_WHITE", neighbourRank);}
     MPI_Send(&token, 1, MPI_INT, neighbourRank, MSG_TOKEN, MPI_COMM_WORLD);
 }
 
@@ -101,6 +97,7 @@ void sendFinishToNeighbour(int my_rank, int p_cnt) {
     int neighbourRank = my_rank == p_cnt - 1 ? 0 : my_rank + 1;
     int emptyBuffer = 0;
 
+    if(DEBUG_PARALLEL){printf("---(%d) Sending finish to neighbour %d\n", my_rank, neighbourRank);}
     MPI_Send(&emptyBuffer, 1, MPI_INT, neighbourRank, MSG_FINISH, MPI_COMM_WORLD);
 }
 
@@ -177,12 +174,13 @@ void processIncomingWork(int workSource) {
     createStackAndMapFromReceived(receivedData, receivedDataSize);
 }
 void receiveSolution(int sender) {
-    int dataLength;
+    const int dataLength = WIDTH*HEIGHT+1;
     MPI_Status status;
+    if(DEBUG_PARALLEL){printf("---(%d) Receiving solution from %d\n", my_rank, sender);}
 
-    MPI_Get_count(&status, MPI_INT, &dataLength);
     long double dataArray[dataLength];
     MPI_Recv(&dataArray, dataLength, MPI_LONG_DOUBLE, sender, MSG_FINISH, MPI_COMM_WORLD, &status);
+    if(DEBUG_PARALLEL){printf("---(%d) Received solution from %d\n", my_rank, sender);}
 
     if (bestScore > dataArray[0]) {
         int counter = 1;
@@ -201,14 +199,18 @@ void receiveSolution(int sender) {
 }
 
 void transmitSolution() {
-    long double * solutionArray = (long double*)malloc((WIDTH*HEIGHT+1)*sizeof(double));
     int counter = 1;
+    long double solutionArray[WIDTH*HEIGHT+1];
+
     solutionArray[0] = bestScore;
+    if(DEBUG_PARALLEL){printf("---(%d) Finish array allocated\n", my_rank);}
     for(int i = 0; i < WIDTH; i++) {
         for (int j = 0; j < HEIGHT; j++) {
-            solutionArray[counter] = (long double)bestMap[i][j];
-            counter++;
+            if(DEBUG_PARALLEL){printf("---(%d) counter=%d\n", my_rank, counter);}
+            solutionArray[counter++] = (long double) bestMap[i][j];
         }
     }
-    MPI_Send(solutionArray, counter, MPI_LONG_DOUBLE, 0, MSG_FINISH, MPI_COMM_WORLD);
+    if(DEBUG_PARALLEL){printf("---(%d) Finish array filled\n", my_rank);}
+    MPI_Send(&solutionArray, counter, MPI_LONG_DOUBLE, 0, MSG_FINISH, MPI_COMM_WORLD);
+    if(DEBUG_PARALLEL){printf("---(%d) Finish array sent\n", my_rank);}
 }

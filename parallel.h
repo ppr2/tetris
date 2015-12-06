@@ -23,7 +23,7 @@ void processIncomingWork(int workSource);
 void receiveSolution(int sender);
 void transmitSolution();
 
-void processToken(int my_rank, int p_cnt);
+void processToken(int my_rank, int p_cnt, int token);
 void sendTokenToNeighbour(int token, int my_rank, int p_cnt);
 void sendFinishToNeighbour(int my_rank, int p_cnt);
 
