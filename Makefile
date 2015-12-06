@@ -8,7 +8,7 @@ fitting_test: fitting_test.o fitting.o
 token_test: token_test.o
 	mpicc -Wall -o token_test token_test.o
 token_test.o: tests/token_test.c
-	mpicc -c -Wall tests/token_test.c
+	mpicc -c -Wall -std=c99 tests/token_test.c
 
 stack_test: stack_test.o stack.o state.o
 	mpicc -Wall -o stack_test stack_test.o stack.o state.o
