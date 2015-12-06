@@ -19,12 +19,12 @@ int processFinish(int sourceRank);
  ************************************************/
 #define _DEBUG 0
 #define _DEBUG_STEPS 0
-#define _WIDTH 3
-#define _HEIGHT 3
+#define _WIDTH 4
+#define _HEIGHT 4
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
-int WIDTH  = 4;//= _WIDTH;
-int HEIGHT = 4;//= _HEIGHT;
+int WIDTH  = _WIDTH;
+int HEIGHT = _HEIGHT;
 int DEBUG  = 0;//= _DEBUG;
 int DEBUG_PARALLEL  = 1;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
@@ -75,8 +75,10 @@ int main(int argc, char** argv) {
     workRequested = 0; // is this process waiting for more work?
     int debug_index = 0;
     while (1) {
-        if (debug_index > 3) exit(1);
+        //if (debug_index > 3) exit(1);
+        printf("---(%d) stack size=%d\n", my_rank, stackSize());
         branchIfYouCan();
+        usleep(10000);
 
         // Is there any process I haven't asked for work yet?
         if (!workRequested && p_index < p_cnt) {
@@ -395,11 +397,13 @@ void computeScore() {
 
 void printMap(char ** map) {
     int x,y;
+    if (DEBUG_PARALLEL){printf("---(%d) ", my_rank);}
     for (x = 0; x < WIDTH*4; x++) {
         printf("=");
     }
     printf("\n");
     for (y = 0; y < HEIGHT; y++) {
+        if (DEBUG_PARALLEL){printf("---(%d) ", my_rank);}
         for (x = 0; x < WIDTH; x++) {
             if (map[x][y] < 2) {
                 printf("|  |");
@@ -409,6 +413,7 @@ void printMap(char ** map) {
         }
         printf("\n");
     }
+    if (DEBUG_PARALLEL){printf("---(%d) ", my_rank);}
     for (x = 0; x < WIDTH*4; x++) {
         printf("=");
     }
