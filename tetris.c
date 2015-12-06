@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
             if (p_index == my_rank) p_index++;
             requestWork(p_index);
             workRequested = 1;
-        } else if (my_rank == 0 && !token_sent) {
+        } else if (my_rank == 0 && p_index >= p_cnt && !token_sent) {
             // I asked everyone. If I'm p0 send token
             sendTokenToNeighbour(TOKEN_WHITE, my_rank, p_cnt);
             token_sent = 1;
@@ -193,8 +193,10 @@ void parseOuterMessages(void) {
     MPI_Status status;
     int msg_arrived, dump;
 
+    printf("---(%d) Probing since I've got nothing to do\n", my_rank);
     MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
     if (msg_arrived) {
+        printf("---(%d) Message arrived! MSG_TAG=%d from %d\n", my_rank, status.MPI_TAG, status.MPI_SOURCE);
         switch (status.MPI_TAG) {
             case MSG_WORK_BATCH:
                 if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_WORK_BATCH \n", my_rank);}
@@ -221,8 +223,11 @@ void parseOuterMessages(void) {
                 MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
                 processToken(my_rank, p_cnt);
                 break;
+            case MSG_WORK_REQUEST:
+                sendNoWork(status.MPI_SOURCE);
+                break;
             default:
-                printf("[R-%d] Invalid MPI tag: %d\n", my_rank, status.MPI_TAG);
+                printf("---(%d) Invalid MPI tag: %d\n", my_rank, status.MPI_TAG);
                 exit(1);
         }
     }
