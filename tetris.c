@@ -69,17 +69,17 @@ int main(int argc, char** argv) {
     results = (int*) calloc(p_cnt, sizeof(int));
 
     parallelInit(my_rank);
-
     if(DEBUG_PARALLEL){printf("---(%d) Initialized\n", my_rank);}
+
     p_index = 0;        // index of work giver
     workRequested = 0; // is this process waiting for more work?
     int debug_index = 0;
+
     while (1) {
         //if (debug_index > 3) exit(1);
-        printf("---(%d) stack size=%d\n", my_rank, stackSize());
+        //printf("---(%d) stack size=%d\n", my_rank, stackSize());
         branchIfYouCan();
         usleep(10000);
-
         // Is there any process I haven't asked for work yet?
         if (!workRequested && p_index < p_cnt) {
             // request work from process p_index
@@ -148,8 +148,7 @@ void branchUntilStackSizeIsBigEnoughToSplit(void) {
 }
 
 void branchIfYouCan(void) {
-    if(DEBUG_PARALLEL){printf("---(%d) Branching 'cause I can!\n", my_rank);}
-    if(DEBUG_PARALLEL){stackPrintOutCompact();}
+    if(DEBUG_PARALLEL && !isStackEmpty()){printf("---(%d) Branching 'cause I can!\n", my_rank);stackPrintOutCompact();}
     /* Init */
     Node *currentNode;
     State *currentState;
@@ -182,8 +181,6 @@ void branchIfYouCan(void) {
             branchFrom(currentState);
             currentNode->isBranched = 1;
         }
-
-        if (DEBUG && DEBUG_STEPS) {getc(stdin);}
 
         if (passes_cnt > 100) {
             parseInnerMessages();
