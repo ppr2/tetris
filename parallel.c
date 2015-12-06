@@ -84,7 +84,7 @@ void parallelInit(int my_rank) {
         int flag;
         MPI_Status status;
 
-        if(DEBUG_PARALLEL){printf("---(%d) waiting for msg\n", my_rank);}
+        if(DEBUG_PARALLEL){printf("---(%d) Waiting for MSG\n", my_rank);}
         // Wait for initial message, can receive MSG_FINISH or MSG_TOKEN
         do {
             MPI_Iprobe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &status);
@@ -133,9 +133,9 @@ void sendWork(int p_recipient, int half) {
     int statesCount = stackSplit(&states, half);
     int dataArray[statesCount*3 + WIDTH*HEIGHT]; // *3 because state consists of 3 integers
     /* Serialize the states to array, save that to dataArray */
-    int *p_dataArray = &dataArray[0];
-    if(DEBUG_PARALLEL){printf("---(%d) Serializing array from stack and map\n", my_rank);}
-    int statesDataSize = getArrayFromStackAndMap(&p_dataArray, states, statesCount);
+    if(DEBUG_PARALLEL){printf("---(%d) Serializing array from stack and map, #states=%d\n", my_rank, statesCount);}
+    int statesDataSize = getArrayFromStackAndMap(dataArray, states, statesCount);
+    if(DEBUG_PARALLEL){printf("---(%d) Serialized array: ,[", my_rank); for(int i=0;i<statesDataSize;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();}
 
     waitForUnfinishedSending();
 
@@ -219,6 +219,7 @@ void transmitSolution() {
 }
 
 void waitForUnfinishedSending(void) {
+    if(DEBUG_PARALLEL){printf("---(%d) Waiting for unfinished sending\n", my_rank);}
     MPI_Status status;
     /* Check for unfinished sending */
     if(previousIncomingWorkRequestRank >= 0) {

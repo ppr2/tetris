@@ -104,14 +104,17 @@ int stackSplit(State **states, int half) {
 
     // Count total number of cuttable nodes
     int cuttableNodeDepth = node->state->depth;
-    int cuttableNodeCount = 0;
-    do {
-        if(DEBUG_PARALLEL){printf("---(%d) (i%d,s%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
-        cuttableNodeCount++;
-        node = node->next;
-    } while(node->next != NULL_NODE && node->state->depth == cuttableNodeDepth && !node->isBranched);
-
-    if(DEBUG_PARALLEL){printf("---(%d) beginning stack split at (%d,%d,d%d)\n\n\n\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
+    int cuttableNodeCount = 1; // We have one already
+    while(node->state->depth == cuttableNodeDepth && !node->isBranched) {
+        if(node->next == NULL_NODE){
+            cuttableNodeCount++; // Count this one but do not move to the NULL_NODE
+            break;
+        } else {
+            node = node->next; // Move to the next one
+            cuttableNodeCount++;
+        }
+    }
+    if(DEBUG_PARALLEL){printf("---(%d) Beginning stack split at (%d,%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
 
     // Cut in half (+1)
     int nodesToCutCount = half ? (cuttableNodeCount + 1) / 2 : 1;
@@ -119,10 +122,14 @@ int stackSplit(State **states, int half) {
         *states = (State *)malloc(nodesToCutCount * sizeof(State));
         if(*states == NULL){printf("---(%d) Out of mem while cutting stack.\n", my_rank); exit(EXIT_FAILURE);}
 
-        Node *firstUncutNode = node;
-        node = node->previous;
+        Node *firstUncutNode;
+        if(node->next == NULL_NODE){
+            firstUncutNode = NULL_NODE;
+        } else {
+            firstUncutNode = node;
+            node = node->previous;
+        }
 
-        // Free nodes
         int i;
         Node *previous;
         for (i = 0; i < nodesToCutCount; i++) {
@@ -136,9 +143,14 @@ int stackSplit(State **states, int half) {
         size -= nodesToCutCount; // Reduce stack size counter
 
         // Repair stack
-        node->next = firstUncutNode;
-        firstUncutNode->previous = node;
-        if(DEBUG_PARALLEL){printf("---(%d) finishing stack split at (%d,%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
+        if(firstUncutNode == NULL_NODE) {
+            node->next = NULL_NODE;
+        } else {
+            node -> next = firstUncutNode;
+            firstUncutNode->previous = node;
+        }
+
+        if(DEBUG_PARALLEL){printf("---(%d) Finishing stack split at (%d,%d,d%d)\n", my_rank, node->state->index, node->state->shape, node->state->depth);}
         return nodesToCutCount;
     }
     return 0;
@@ -156,7 +168,7 @@ void freeNode(Node *node){
     free(node);
 }
 
-int getArrayFromStackAndMap(int **arr, State *states, int statesCount){
+int getArrayFromStackAndMap(int *arr, State *states, int statesCount){
     if(statesCount <= 0){return 0;}
     int stateLen = 3, i;
     int mapLen = WIDTH * HEIGHT;
@@ -176,10 +188,10 @@ int getArrayFromStackAndMap(int **arr, State *states, int statesCount){
 
     // Save to arr
     for(i=0;i<mapLen;i++){
-        arr[i] = mapToSerialize+i;
+        arr[i] = mapToSerialize[i];
     }
     for(i=0;i<size-mapLen;i++){
-        arr[mapLen+i] = statesToSerialize+i;
+        arr[mapLen+i] = statesToSerialize[i];
     }
 
     return size;

@@ -19,12 +19,12 @@ int processFinish(int sourceRank);
  ************************************************/
 #define _DEBUG 0
 #define _DEBUG_STEPS 0
-#define _WIDTH 5
+#define _WIDTH 3
 #define _HEIGHT 4
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
-int WIDTH  = 4;//= _WIDTH;
-int HEIGHT = 5;//= _HEIGHT;
+int WIDTH  = 3;//= _WIDTH;
+int HEIGHT = 4;//= _HEIGHT;
 int DEBUG  = 0;//= _DEBUG;
 int DEBUG_PARALLEL  = 1;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
