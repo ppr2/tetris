@@ -54,7 +54,7 @@ void parallelInit(int my_rank) {
             case MSG_WORK_BATCH:
                 if(DEBUG_PARALLEL){printf("---(%d) received work_batch\n", my_rank);}
                 createStackAndMapFromReceived(dataArray, dataLength);
-                if(DEBUG_PARALLEL){printf("---(%d) Incoming serialized array: ,[", my_rank); for(int i=0;i<dataLength;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();printMap(map);}
+                if(DEBUG_PARALLEL){printf("---(%d) Incoming serialized array: ,[", my_rank); for(int i=0;i<dataLength;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();}
                 break;
             default:
                 //TODO ERROR
@@ -151,6 +151,7 @@ void sendWork(int p_recipient, int half) {
  * Request more work
  */
 void requestWork(int workSenderRank) {
+    if(DEBUG_PARALLEL){printf("---(%d) Requesting work from p_%d\n", my_rank, workSenderRank);}
     int emptyBuffer = 0;
 
     printf("---(%d) Requesting work from p%d\n", my_rank, workSenderRank);
@@ -162,6 +163,7 @@ void requestWork(int workSenderRank) {
  * Work on incoming work, which we have requested
  */
 void processIncomingWork(int workSource) {
+    if(DEBUG_PARALLEL){printf("---(%d) Processing incoming work from p_%d\n", my_rank, workSource);}
     /* Get incoming message */
     int receivedDataSize;
     MPI_Status status;
