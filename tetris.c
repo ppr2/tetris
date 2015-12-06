@@ -73,10 +73,8 @@ int main(int argc, char** argv) {
 
     p_index = 0;        // index of work giver
     workRequested = 0; // is this process waiting for more work?
-    int debug_index = 0;
 
     while (1) {
-        //if (debug_index > 3) exit(1);
         //printf("---(%d) stack size=%d\n", my_rank, stackSize());
         branchIfYouCan();
         usleep(10000);
@@ -84,15 +82,16 @@ int main(int argc, char** argv) {
         if (!workRequested && p_index < p_cnt) {
             // request work from process p_index
             if (p_index == my_rank) p_index++;
-            requestWork(p_index);
-            workRequested = 1;
+            if (p_index < p_cnt) {
+                requestWork(p_index);
+                workRequested = 1;
+            }
         } else if (my_rank == 0 && p_index >= p_cnt && !token_sent) {
             // I asked everyone. If I'm p0 send token
             sendTokenToNeighbour(TOKEN_WHITE, my_rank, p_cnt);
             token_sent = 1;
         }
         parseOuterMessages();
-        debug_index++;
     }
       
       
@@ -173,6 +172,7 @@ void branchIfYouCan(void) {
             fit(currentState, EMPTY); // Unfit: Remove shape at index (replace with EMPTY=0)
 
             if (isLeaf(currentNode->state)) {
+                computeScore();
             }
 
             frequencies[getSimpleShape(currentState->shape)]--;
@@ -218,10 +218,10 @@ void parseOuterMessages(void) {
                 }
                 break;
             case MSG_TOKEN:
-                if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_TOKEN \n", my_rank);}
                 // receive so it's not stuck in queue
                 MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
-                processToken(my_rank, p_cnt);
+                if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_TOKEN (%s)\n", my_rank, dump ? "TOKEN_BLACK" : "TOKEN_WHITE");}
+                processToken(my_rank, p_cnt, dump);
                 break;
             case MSG_WORK_REQUEST:
                 if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_WORK_REQUEST \n", my_rank);}
@@ -265,7 +265,7 @@ void parseInnerMessages(void) {
 }
 
 int doIHaveResultsFromAllProcesses() {
-    for (int i = 0; i < p_cnt; i++) {
+    for (int i = 1; i < p_cnt; i++) {
         if (results[i] == 0) {
             return 0;
         }
@@ -277,6 +277,7 @@ int doIHaveResultsFromAllProcesses() {
 int processFinish(int sourceRank) {
     int dump;
     MPI_Status status;
+
     if (my_rank == 0) {
         receiveSolution(sourceRank);
         if (doIHaveResultsFromAllProcesses()) {
@@ -287,13 +288,23 @@ int processFinish(int sourceRank) {
             free(results);
 
             MPI_Finalize();
-            return 1;
+
+            /* Results output */
+            printf("\n--- RESULTS ---\n");
+            if (bestMap == NULL) {
+                printf("bestMap is null, it definitely won't blend :(\n");
+            } else {
+                printMap(bestMap);
+                printf("score -> %Lf\n", bestScore);
+                printf("\n");
+            }
+            return 0;
         } else {
 
             return 0;
         }
     } else {
-        MPI_Recv(&dump, 1, MPI_INT, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
+        MPI_Recv(&dump, 1, MPI_INT, sourceRank, MSG_FINISH, MPI_COMM_WORLD, &status);
         transmitSolution();
         sendFinishToNeighbour(my_rank, p_cnt);
         // TODO free memory
@@ -388,8 +399,11 @@ void computeScore() {
         printf("--- /LEAF ---\n");
     }
 
+    //if(DEBUG_PARALLEL){printf("---(%d) Computing score. newScore=%Lf\n", my_rank, newScore);}
+
     if (newScore != 2) {
         if (newScore < bestScore) {
+            if(DEBUG_PARALLEL){printf("---(%d) Replacing old score=%Lf\n", my_rank, bestScore);}
             if (bestMap == NULL) {
                 bestMap = newMap();
             }
