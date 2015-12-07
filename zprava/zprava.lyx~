@@ -644,11 +644,7 @@ Naměřené výsledky a vyhodnocení
 placement H
 wide false
 sideways false
-status collapsed
-
-\begin_layout Plain Layout
-
-\end_layout
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -971,7 +967,7 @@ x
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Naměřené časy v závislosti na velikosti plochy a počtu procesorů
+Naměřené časy v sekundách v závislosti na velikosti plochy a počtu procesorů
 \end_layout
 
 \end_inset
@@ -997,10 +993,6 @@ Paralelní implementace přinesla oproti sekvenčnímu řešení znatelně vyš�
 
 \begin_layout Section
 Literatura
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \begin_layout Section
