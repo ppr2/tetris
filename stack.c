@@ -197,7 +197,7 @@ int getArrayFromStackAndMap(int *arr, State *states, int statesCount){
         //getArrayFromState(statesToSerialize, states + i, counter_p);
         state = states + i;
         if(DEBUG_PARALLEL){printf("---(%d) freeing at i=%d\n", my_rank, i);};
-        free(&state);
+        //free(&state);
     }
 
     // Save to arr

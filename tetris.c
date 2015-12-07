@@ -26,7 +26,7 @@ int processFinish(int sourceRank);
 int WIDTH  = _WIDTH;
 int HEIGHT = _HEIGHT;
 int DEBUG  = 0;//= _DEBUG;
-int DEBUG_PARALLEL  = 1;//= _DEBUG;
+int DEBUG_PARALLEL  = 0;//= _DEBUG;
 const int DEBUG_STEPS = _DEBUG_STEPS;
 const int INDEX_MAX = _INDEX_MAX;
 int workRequested; // 0/1 whether work was requested
@@ -201,7 +201,7 @@ void parseOuterMessages(void) {
     //printf("---(%d) Probing p_index=%d\n", my_rank, p_index);
     MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &msg_arrived, &status);
     if (msg_arrived) {
-        printf("---(%d) Message arrived! MSG_TAG=%d from %d\n", my_rank, status.MPI_TAG, status.MPI_SOURCE);
+        if(DEBUG_PARALLEL){printf("---(%d) Message arrived! MSG_TAG=%d from %d\n", my_rank, status.MPI_TAG, status.MPI_SOURCE);}
         switch (status.MPI_TAG) {
             case MSG_WORK_BATCH:
                 if(DEBUG_PARALLEL){printf("---(%d) Parse Outer Messages -> MSG_WORK_BATCH \n", my_rank);}
