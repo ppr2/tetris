@@ -37,8 +37,8 @@ Node *stackPeek(void){
 void stackDeleteTop(void){
     if(stackTop==NULL_NODE){return;}
     Node *previous = stackTop->previous;
-    //free(stackTop->state);
-    //freeNode(stackTop);
+    free(stackTop->state);
+    freeNode(stackTop);
     stackTop = previous;
     if(stackTop != NULL_NODE){
         stackTop->next = NULL_NODE;
@@ -137,7 +137,7 @@ int stackSplit(State **states, int half) {
             previous = node->previous;
 
             //TODO free what is to be freed, but allow sending of data
-            //freeNode(node);
+            freeNode(node);
             node = previous;
         }
         size -= nodesToCutCount; // Reduce stack size counter
@@ -200,13 +200,15 @@ int getArrayFromStackAndMap(int *arr, State *states, int statesCount){
 void createStackAndMapFromReceived(int *data, int dataLength) {
     int i,j, counter = 0;
 
+    // Reset frequencies
+    for(i=0;i<7;i++) frequencies[i] = 0;
+
     // Init stack
     stackTop = NULL_NODE;
     stackBottom = NULL_NODE;
     size = 0;
 
     // Parse & create map
-    //map = newMap(); alokuje se uz tetris.c - main()
     for(i=0;i<WIDTH;i++){
         for(j=0;j<HEIGHT;j++){
             map[i][j] = (char) data[counter];

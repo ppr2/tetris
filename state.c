@@ -15,6 +15,7 @@ void getArrayFromState(int *arr, State *state, int *index){
     arr[(*index)++] = state->index;
     arr[(*index)++] = (int)state->shape;
     arr[(*index)++] = state->depth;
+    free(state);
 }
 
 State getStateFromArray(int *arr, int *index){
