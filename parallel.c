@@ -131,15 +131,6 @@ void sendWork(int p_recipient, int half) {
     /* Send states array to p_recipient */
     MPI_Isend(&dataArray, statesDataSize, MPI_INT, p_recipient, MSG_WORK_BATCH, MPI_COMM_WORLD, &request);
     MPI_Wait(&request, &status);
-    /* Free up memory if I sent something */
-/*    if(statesCount > 0) {
-        // Free states
-        for(int i = 0; i < statesCount; i++) {
-            free(&states[i]);
-        }
-        // Free states pointer
-        //free(states);
-    }*/
 }
 
 /**
