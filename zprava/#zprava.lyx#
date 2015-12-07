@@ -247,41 +247,21 @@ Definice problému
 \end_layout
 
 \begin_layout Subsection
-Vstupní data
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-a, b
-\family default
- = přirozená čísla, 
-\family typewriter
-a≥b≥5
-\family default
-, reprezentující délky stran hrací plochy 
-\family typewriter
-S
-\family default
- o velikosti 
-\family typewriter
-a x b, F
-\family default
- = množina 5 kostek hry Tetris a jejich rotací 
-\end_layout
-
-\begin_layout Subsection
 Úkol
 \end_layout
 
 \begin_layout Standard
-Úkolem bylo nalézt zaplnění plochy 
+Úkolem bylo nalézt zaplnění hrací plochy 
 \family typewriter
-S
+S 
 \family default
- tak, aby nezaplněný zbytek byl co minimální a četnost použitých kostek
- byla co nejvíce rovnoměrná.
- Nebo-li minimalizovat funkci:
+hry 
+\series bold
+tetris
+\series default
+ tak, aby nezaplněný zbytek (volná pole hrací plochy) byl co nejmenší a
+ četnost použitých kostek byla co nejvíce rovnoměrná.
+ Nebo-li minimalizační kritérium je funkce:
 \begin_inset Formula 
 \[
 Q(a,b)\text{=\left(1+\frac{p}{ab}\right)*\left(|C_{i}-\min(C)|\right)}
@@ -305,7 +285,32 @@ C
 \end_layout
 
 \begin_layout Subsection
-Sekvenční algoritmus
+Vstupní data
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+a, b
+\family default
+ = přirozená čísla, 
+\family typewriter
+a≥b≥5
+\family default
+, reprezentující délky stran hrací plochy 
+\family typewriter
+S
+\family default
+ o velikosti 
+\family typewriter
+a x b, F
+\family default
+ = množina 5 kostek hry Tetris a jejich rotací (celkem tedy 20 odlišných
+ tvarů).
+\end_layout
+
+\begin_layout Section
+Popis sekvenčního algoritmu
 \end_layout
 
 \begin_layout Standard
@@ -338,8 +343,33 @@ S
  je zaplněna.
 \end_layout
 
-\begin_layout Section
-Popis sekvenčního algoritmu
+\begin_layout Subsection
+Prohledávání do hloubky metodou větví a řezů BB-DFS
+\end_layout
+
+\begin_layout Standard
+Cílem prohledávání stavového prostoru je nalezení přípustného koncového
+ stavu s nejmenší cenou.
+ Cena je definována funkcí 
+\family typewriter
+Q(a,b)
+\family default
+, která vrací hodnotu ordinálního typu.
+ Při prvním nalezení přípustného koncového stavu se nastaví počáteční hodnota
+ této ceny nebo je možné před spuštěním algoritmu prohledávání nastavit
+ počáteční odhad ceny (to může být buď +/-nekonečno nebo hodnota odvozená
+ ze vstupních data).
+ 
+\end_layout
+
+\begin_layout Standard
+Kdykoli se nalezne nový přípustný koncový stav, zkontroluje se, zda je jeho
+ cena menší než cena dosavadního nejlepšího řešení.
+ Pokud ano, provede se aktualizace nejlepšího řešení.
+ V každém případě se provede návrat.
+ Návrat se provádí z nepřípustných mezistavů.
+ Navíc se ale návrat provádí i z přípustných mezistavů, které nemohou vést
+ k řešením s nižší cenou, než je nejlepší dosud nalezené řešení.
 \end_layout
 
 \begin_layout Subsection
@@ -359,11 +389,29 @@ fitting.c
 .
  Pro realizaci zásobníku jsme zvolili obousměrně zřetězený spojový seznam
  uzlů, ve kterých je uložena hloubka, stav, informace o tom, zda z uzlu
- byla provedena expanze
+ byla provedena expanze - zásobník je v souboru 
+\family typewriter
+stack.c
+\family default
+.
+ Paralelní část aplikace je z velké části v souboru 
+\family typewriter
+parallel.c
+\family default
+ a následně v cyklech hlavního souboru 
+\family typewriter
+tetris.c
+\family default
+.
+ Aplikace obsahuje i jednoduché testy některých funkcí.
 \end_layout
 
 \begin_layout Section
 Popis paralelního algoritmu a jeho implementace v MPI
+\end_layout
+
+\begin_layout Standard
+Následuje popis použitých metod, kód implementace se nachází v příloze.
 \end_layout
 
 \begin_layout Subsection
@@ -390,6 +438,47 @@ Metoda dělení zásobníku u dna D-ADZ
 
 \begin_layout Standard
 Žadatel obdrží zásobník s jednou polovinou stavu co nejblíže dnu.
+ V případě inicializace paralelního algoritmu se expanduje tak dlouho, dokud
+ není dost práce pro všechny procesory, poté se každému pošle ode dna jeden
+ stav.
+\end_layout
+
+\begin_layout Standard
+Důvod pro volbu tohoto algoritmu je ten, že stavy u dna nabízí potenciálně
+ nejvíc budoucích stavů po expanzi, proto má smysl je rozesílat ostatním
+ procesorům.
+ Popsanou metodou je pravděpodobné, že každý procesor bude mít stejně práce
+ v počáteční fázi výpočtu.
+\end_layout
+
+\begin_layout Subsection
+Algoritmus pro hledání dárce ACZ-AHD (asynchroní cyklické žádosti)
+\end_layout
+
+\begin_layout Standard
+Každý procesor si udržuje lokální čítač 
+\family typewriter
+D
+\family default
+, kde 
+\family typewriter
+1<= D <=p
+\family default
+, označující potenciálního dárce.
+ Procesor s prázdným zásobníkem pošle žádost o práci procesoru 
+\family typewriter
+PD
+\family default
+ a inkrementuje čítač 
+\family typewriter
+D mod p
+\family default
+.
+ Může se stát, že jeden a tentýž procesor obdrží několik žádostí o práci.
+ Algoritmus jsme zvolili pro jeho jednoduchost - je však zřejmé, že volba
+ např.
+ inkrementace vlastního indexu o 1 by byla vhodnější, neboť by se procesory
+ netázaly vždy od prvního a objem celkového dotazování by se tak zmenšil.
 \end_layout
 
 \begin_layout Subsection
@@ -550,8 +639,356 @@ W
 Naměřené výsledky a vyhodnocení
 \end_layout
 
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="4">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Rozměry plochy
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Počet CPU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5x5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6x6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7x7
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1 - sekvenční
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.94
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+136.68
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.46
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.33
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+běží u mě
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5.17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+pustit na 40
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Naměřené časy v sekundách v závislosti na velikosti plochy a počtu procesorů
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Závěr
+\end_layout
+
+\begin_layout Standard
+Paralelní implementace přinesla oproti sekvenčnímu řešení znatelně vyšší
+ rychlost výpočtu.
+ Další ořezávání a volba lepšího algoritmu pro výběr dárce by přinesly další
+ zrychlení.
 \end_layout
 
 \begin_layout Section

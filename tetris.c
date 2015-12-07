@@ -19,8 +19,8 @@ int processFinish(int sourceRank);
  ************************************************/
 #define _DEBUG 0
 #define _DEBUG_STEPS 0
-#define _WIDTH 5
-#define _HEIGHT 5
+#define _WIDTH 7
+#define _HEIGHT 7
 #define _INDEX_MAX _WIDTH * _HEIGHT
 
 int WIDTH  = _WIDTH;
@@ -97,18 +97,6 @@ int main(int argc, char** argv) {
         }
         parseOuterMessages();
     }
-      
-      
-    /* Results output */
-    printf("\n--- RESULTS ---\n");
-    if (bestMap == NULL) {
-        printf("bestMap is null, it definitely won't blend :(\n");
-    } else {
-        printMap(bestMap);
-        printf("score -> %Lf\n", bestScore);
-        printf("\n");
-    }
-    return EXIT_SUCCESS;
 }
 
 

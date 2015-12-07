@@ -716,7 +716,7 @@ Počet CPU
 \begin_inset Text
 
 \begin_layout Plain Layout
-6x7
+6x6
 \end_layout
 
 \end_inset
@@ -736,7 +736,7 @@ Počet CPU
 \begin_inset Text
 
 \begin_layout Plain Layout
-1
+1 - sekvenční
 \end_layout
 
 \end_inset
@@ -745,7 +745,7 @@ Počet CPU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+2.94
 \end_layout
 
 \end_inset
@@ -754,7 +754,7 @@ Počet CPU
 \begin_inset Text
 
 \begin_layout Plain Layout
-x
+136.68
 \end_layout
 
 \end_inset
@@ -783,7 +783,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.46
 \end_layout
 
 \end_inset
@@ -792,7 +792,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+31.28
 \end_layout
 
 \end_inset
@@ -801,7 +801,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+x
 \end_layout
 
 \end_inset
@@ -821,7 +821,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.33
 \end_layout
 
 \end_inset
@@ -830,7 +830,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+22.44
 \end_layout
 
 \end_inset
@@ -839,7 +839,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+x
 \end_layout
 
 \end_inset
@@ -859,7 +859,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.22
 \end_layout
 
 \end_inset
@@ -868,7 +868,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+14.96
 \end_layout
 
 \end_inset
@@ -877,7 +877,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+x
 \end_layout
 
 \end_inset
@@ -897,7 +897,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.06
 \end_layout
 
 \end_inset
@@ -906,7 +906,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+5.17
 \end_layout
 
 \end_inset
@@ -915,7 +915,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+pustit na 40
 \end_layout
 
 \end_inset
@@ -935,7 +935,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+0.08
 \end_layout
 
 \end_inset
@@ -944,7 +944,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+5.31
 \end_layout
 
 \end_inset
@@ -953,7 +953,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+u mě
 \end_layout
 
 \end_inset
