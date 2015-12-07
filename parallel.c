@@ -19,6 +19,7 @@ int tokenColor = TOKEN_WHITE;
 int solutionSent = 0;
 MPI_Request *solutionRequests;
 int *solutionArray;
+extern Node *stackTop;
 
 void parallelInit(int my_rank) {
     //if(DEBUG_PARALLEL){printf("---(%d) Parallel init \n", my_rank);}
@@ -120,7 +121,9 @@ void sendWork(int p_recipient, int half) {
     MPI_Request request;
     MPI_Status status;
 
+    stackPrintOutCompact();
     int statesCount = stackSplit(&states, half);
+    stackPrintOutCompact();
     int dataArray[statesCount*3 + WIDTH*HEIGHT]; // *3 because state consists of 3 integers
     /* Serialize the states to array, save that to dataArray */
     if(DEBUG_PARALLEL){printf("---(%d) Serializing array from stack and map, #states=%d\n", my_rank, statesCount);}
@@ -140,7 +143,6 @@ void requestWork(int workSenderRank) {
     if(DEBUG_PARALLEL){printf("---(%d) Requesting work from p_%d\n", my_rank, workSenderRank);}
     int emptyBuffer = 0;
 
-    printf("---(%d) Requesting work from p%d\n", my_rank, workSenderRank);
     /* Send the work request */
     MPI_Send(&emptyBuffer, 1, MPI_INT, workSenderRank, MSG_WORK_REQUEST, MPI_COMM_WORLD);
 }
