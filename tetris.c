@@ -46,6 +46,7 @@ int p_cnt;         // processor count
 int my_rank;       // rank of this process
 int p_index;       // index of work giving process
 int workRequested; // 0/1 whether work was requested
+double t1, t2;      // p0 only for measuring time
 
 #define MSG_WORK_REQUEST 1000
 #define MSG_WORK_BATCH    1001
@@ -65,6 +66,10 @@ int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &p_cnt);
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (my_rank == 0) {
+        t1 = MPI_Wtime();
+    }
     map = newMap();
     results = (int*) calloc(p_cnt, sizeof(int));
 
@@ -166,6 +171,7 @@ void branchIfYouCan(void) {
 
         fit(currentState, currentState->shape); // Fit: Fit shape to place index
         if (currentNode->isBranched || isLeaf(currentNode->state)) {
+
             if(DEBUG){printf("unfit i%d s%d\n", currentState->index, currentState->shape);}
 
             fit(currentState, EMPTY); // Unfit: Remove shape at index (replace with EMPTY=0)
@@ -290,12 +296,13 @@ int processFinish(int sourceRank) {
                 printf("score -> %Lf\n", bestScore);
                 printf("\n");
             }
+            t2 = MPI_Wtime();
+            printf("---(0) Parallel time: %f\n",t2-t1);
 
             /* Free global structures */
             freeMap(map);
             freeMap(bestMap);
             free(results);
-
             MPI_Finalize();
             return 1;
         } else {
