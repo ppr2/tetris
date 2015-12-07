@@ -189,7 +189,7 @@ int getArrayFromStackAndMap(int *arr, State *states, int statesCount){
     int counter = 0;
     State * state;
     for(i=0;i<statesCount;i++){
-        if(DEBUG_PARALLEL){printf("---(%d) State[%d] (%d,%d,%d)\n", my_rank, i, state[i].index, state[i].shape, state[i].depth);};
+        if(DEBUG_PARALLEL){printf("---(%d) State[%d] (%d,%d,%d)\n", my_rank, i, states[i].index, states[i].shape, states[i].depth);};
         statesToSerialize[counter] = (states + i)->index;
         statesToSerialize[counter+1] = (int) (states + i)->shape;
         statesToSerialize[counter+2] = (states + i)->depth;
