@@ -8,7 +8,7 @@
 
 extern int WIDTH, HEIGHT, DEBUG_PARALLEL, my_rank;
 extern char ** map;
-extern int frequencies[7];
+extern char frequencies[7];
 
 typedef struct{
     State *state;
