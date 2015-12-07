@@ -292,9 +292,9 @@ int processFinish(int sourceRank) {
             }
 
             /* Free global structures */
-/*            freeMap(map);
+            freeMap(map);
             freeMap(bestMap);
-            free(results);*/
+            free(results);
 
             MPI_Finalize();
             return 1;
@@ -307,8 +307,9 @@ int processFinish(int sourceRank) {
         transmitSolution();
         sendFinishToNeighbour(my_rank, p_cnt);
         /* Free global structures */
-/*        freeMap(map);
-        freeMap(bestMap);*/
+        freeMap(map);
+        freeMap(bestMap);
+        free(results);
 
         MPI_Finalize();
         return 1;
