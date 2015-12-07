@@ -4,6 +4,7 @@
 #include "stack.h"
 #include "fitting.h"
 #include <limits.h>
+#include <time.h>
 
 
 
@@ -42,6 +43,7 @@ long double bestScore = 9999999;
 char frequencies[7] = {0};
 
 int main(int argc, char** argv) {
+    clock_t start = clock();
     if (argc < 3 || argc > 4) {
       fprintf(stderr, "Invalid number of arguments. Call tetris WIDTH HEIGHT [DEBUG]\n");
       return 1;
@@ -96,6 +98,9 @@ int main(int argc, char** argv) {
     freeMap(map);
     freeMap(bestMap);
 
+    clock_t end = clock();
+    float seconds = (float)(end - start) / CLOCKS_PER_SEC;
+    printf("Sequential time is %f\n", seconds);
     return 0;
 }
 
