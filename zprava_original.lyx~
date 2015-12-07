@@ -1,0 +1,742 @@
+#LyX file created by tex2lyx 2.1
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\usepackage{epsf}
+\usepackage{epic}\usepackage{eepic}\usepackage{eepicemu}%\documentstyle[epsf,epic,eepic,eepicemu]{article}
+
+
+
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding cp1250
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 0
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+%
+\backslash
+oddsidemargin=-5mm 
+\backslash
+evensidemargin=-5mm 
+\backslash
+marginparwidth=.08in
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+%
+\backslash
+marginparsep=.01in 
+\backslash
+marginparpush=5pt 
+\backslash
+topmargin=-15mm
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+%
+\backslash
+headheight=12pt 
+\backslash
+headsep=25pt 
+\backslash
+footheight=12pt 
+\backslash
+footskip=30pt
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+%
+\backslash
+textheight=25cm 
+\backslash
+textwidth=17cm 
+\backslash
+columnsep=2mm 
+\backslash
+columnseprule=1pt
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+%
+\backslash
+parindent=15pt
+\backslash
+parskip=2pt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\series bold
+Semestralní projekt MI-PAR 2010/2011:
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+
+\backslash
+[5mm]
+\end_layout
+
+\end_inset
+
+ Paralelní algoritmus pro řešení problému
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+
+\backslash
+[5mm]
+\end_layout
+
+\end_inset
+
+ Jméno1 Příjmení1
+\begin_inset Newline newline
+\end_inset
+
+ Jméno2 Příjmení2
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+
+\backslash
+[2mm]
+\end_layout
+
+\end_inset
+
+ magisterské studijum, FIT ČVUT, Kolejní 550/2, 160 00 Praha 6
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+
+\backslash
+[2mm]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+today
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Definice problému a popis sekvenčního algoritmu
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Popište problém, který váš program řeší. Jako výchozí použijte text zadání, který rozšiřte o přesné vymezení všech odchylek, které jste vůči zadání během implementace provedli (např. úpravy heuristické funkce, organizace zásobníku, apod.). Zmiňte i případně i takové prvky algoritmu, které v zadání nebyly specifikovány, ale které se ukázaly jako důležité. Dále popište vstupy a výstupy algoritmu (formát vstupních a výstupních dat). Uveďte tabulku nameřených časů sekvenčního algoritmu pro různě velká data.
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Popis paralelního algoritmu a jeho implementace v MPI
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Popište paralelní algoritmus, opět vyjděte ze zadání a přesně vymezte odchylky, zvláště u algoritmu pro vyvažování zátěže, hledání dárce, ci ukončení výpočtu. Popište a vysvětlete strukturu celkového paralelního algoritmu na úrovni procesů v MPI a strukturu kódu jednotlivých procesů. Např. jak je naimplementována smyčka pro činnost procesů v aktivním stavu i v stavu nečinnosti. Jaké jste zvolili konstanty a parametry pro škálování algoritmu. Struktura a sémantika příkazové řádky pro spouštění programu.
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Naměřené výsledky a vyhodnocení
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Zvolte tři instance problému s takovou velikostí vstupních dat, pro které má sekvenční algoritmus časovou složitost kolem 5, 10 a 15 minut. Pro meření čas potřebný na čtení dat z disku a uložení na disk neuvažujte a zakomentujte ladící tisky, logy, zprávy a výstupy. 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Měřte paralelní čas při použití 
+\begin_inset Formula $i=2,\cdot,32$
+\end_inset
+
+ procesorů na sítích Ethernet a InfiniBand. 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+%
+\backslash
+item Pri mereni kazde instance problemu na dany pocet procesoru spoctete pro vas algoritmus dynamicke delby prace celkovy pocet odeslanych zadosti o praci, prumer na 1 procesor a jejich uspesnost.
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+%
+\backslash
+item Mereni pro dany pocet procesoru a instanci problemu provedte 3x a pouzijte prumerne hodnoty.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Z naměřených dat sestavte grafy zrychlení 
+\begin_inset Formula $S(n,p)$
+\end_inset
+
+. Zjistěte, zda a za jakych podmínek došlo k superlineárnímu zrychlení a pokuste se je zdůvodnit. 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Vyhodnoďte komunikační složitost dynamického vyvažování zátěže a posuďte vhodnost vámi implementovaného algoritmu pro hledání dárce a dělení zásobníku pri řešení vašeho problému. Posuďte efektivnost a škálovatelnost algoritmu. Popište nedostatky vaší implementace a navrhněte zlepšení. 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Empiricky stanovte granularitu vaší implementace, tj., stupeň paralelismu pro danou velikost řešeného problému. Stanovte kritéria pro stanovení mezí, za kterými již není učinné rozkládat výpočet na menší procesy, protože by komunikační náklady prevážily urychlení paralelním výpočtem.
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Závěr
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Celkové zhodnocení semestrální práce a zkušenosti získaných během semestru.
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Literatura
+\end_layout
+
+\begin_layout Standard
+\start_of_appendix
+
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+%dummy comment inserted by tex2lyx to ensure that this paragraph is not empty
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Návod pro vkládání grafů a obrázků do Latexu
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Nejjednodušší způsob vytvoření obrázku je použít vektorový grafický editor (např. xfig nebo jfig), ze kterého lze exportovat buď 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+postscript formáty (ps nebo eps formát) nebo 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+latex formáty (v pořadí prostý latex, latex s macry epic, eepic, eepicemu). Uvedené pořadí odpovídá růstu komplikovanosti obrázků který formát podporuje (prostá latex macra umožnují pouze jednoduché, epic makra něco mezi, je třeba vyzkoušet).
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Následující příklady platí pro všechny případy.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Obrázek v postscriptu, vycentrovaný a na celou šířku stránky, s popisem a číslem. Všimnete si, jak řídit velikost obrazku. 
+\begin_inset Float figure
+placement ht
+wide false
+sideways false
+status open
+
+
+\begin_layout Standard
+
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+epsfysize
+\end_layout
+
+\end_inset
+
+=3cm 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+centerline{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+epsfbox{VasObrazek.ps}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Popis vašeho obrazku
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "labelvasehoobrazku"
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Obrázek pouze vložený mezi řádky textu, bez popisu a číslování.
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+epsfxsize
+\end_layout
+
+\end_inset
+
+=1cm 
+\begin_inset CommandInset line
+LatexCommand rule
+width "0pt"
+height "0pt"
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+epsfbox{VasObrazek.ps}
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+width "0pt"
+height "0pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Latexovské obrázky maji přípony *.latex, *.epic, *.eepic, a *.eepicemu, respective. 
+\begin_inset Float figure
+placement ht
+wide false
+sideways false
+status open
+
+
+\begin_layout Standard
+\align center
+
+\series bold
+
+\begin_inset CommandInset include
+LatexCommand input
+preview false
+filename ".lyx"
+
+\end_inset
+
+VasObrazek.latex 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Popis vašeho obrázku
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "l1"
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Vypuštením závorek 
+\family typewriter
+
+\series default
+figure
+\family default
+\series bold
+\shape default
+ dostanete opět pouze rámeček v textu bez čísla a popisu.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Takhle jednoduše můžete poskládat obrázky vedle sebe. 
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+setlength{
+\backslash
+unitlength}{0.1mm}
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand input
+preview false
+filename ".lyx"
+
+\end_inset
+
+VasObrazek.epic 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+hglue
+\end_layout
+
+\end_inset
+
+ 5mm 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+setlength{
+\backslash
+unitlength}{0.15mm}
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand input
+preview false
+filename ".lyx"
+
+\end_inset
+
+VasObrazek.eepic 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+hglue
+\end_layout
+
+\end_inset
+
+ 5mm 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+setlength{
+\backslash
+unitlength}{0.2mm}
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand input
+preview false
+filename ".lyx"
+
+\end_inset
+
+VasObrazek.eepicemu 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Řídit velikost latexovskych obrázků lze příkazem 
+\end_layout
+
+\begin_layout Verbatim
+
+\backslash
+setlength{
+\backslash
+unitlength}{0.1mm}
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+které mění měřítko rastru obrázku, Tyto příkazy je ale současně nutné vyhodit ze souboru, který xfig vygeneroval.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Pro vytváření grafu lze použít program gnuplot, který umí generovat postscriptovy soubor, ktery vložíte do Latexu výše uvedeným způsobem.
+\end_layout
+
+\end_body
+\end_document

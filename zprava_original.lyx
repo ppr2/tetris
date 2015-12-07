@@ -1,0 +1,417 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding cp1250
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 0
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+oddsidemargin=-5mm 
+\backslash
+evensidemargin=-5mm 
+\backslash
+marginparwidth=.08in
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+marginparsep=.01in 
+\backslash
+marginparpush=5pt 
+\backslash
+topmargin=-15mm
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+headheight=12pt 
+\backslash
+headsep=25pt 
+\backslash
+footheight=12pt 
+\backslash
+footskip=30pt
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+textheight=25cm 
+\backslash
+textwidth=17cm 
+\backslash
+columnsep=2mm 
+\backslash
+columnseprule=1pt
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+parindent=15pt
+\backslash
+parskip=2pt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\series bold
+Semestralní projekt MI-PAR 2014/2015:
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[5mm]
+\end_layout
+
+\end_inset
+
+ Paralelní algoritmus pro řešení problému
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[5mm]
+\end_layout
+
+\end_inset
+
+ Matěj Židek
+\begin_inset Newline newline
+\end_inset
+
+ Kryštof Šplíchal
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2mm]
+\end_layout
+
+\end_inset
+
+ magisterské studijum, FIT ČVUT, Kolejní 550/2, 160 00 Praha 6
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2mm]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+today
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Definice problému a popis sekvenčního algoritmu
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Popište problém, který váš program řeší.
+ Jako výchozí použijte text zadání, který rozšiřte o přesné vymezení všech
+ odchylek, které jste vůči zadání během implementace provedli (např.
+ úpravy heuristické funkce, organizace zásobníku, apod.).
+ Zmiňte i případně i takové prvky algoritmu, které v zadání nebyly specifikovány
+, ale které se ukázaly jako důležité.
+ Dále popište vstupy a výstupy algoritmu (formát vstupních a výstupních
+ dat).
+ Uveďte tabulku nameřených časů sekvenčního algoritmu pro různě velká data.
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Popis paralelního algoritmu a jeho implementace v MPI
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Popište paralelní algoritmus, opět vyjděte ze zadání a přesně vymezte odchylky,
+ zvláště u algoritmu pro vyvažování zátěže, hledání dárce, ci ukončení výpočtu.
+ Popište a vysvětlete strukturu celkového paralelního algoritmu na úrovni
+ procesů v MPI a strukturu kódu jednotlivých procesů.
+ Např.
+ jak je naimplementována smyčka pro činnost procesů v aktivním stavu i v
+ stavu nečinnosti.
+ Jaké jste zvolili konstanty a parametry pro škálování algoritmu.
+ Struktura a sémantika příkazové řádky pro spouštění programu.
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Naměřené výsledky a vyhodnocení
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Zvolte tři instance problému s takovou velikostí vstupních dat, pro které
+ má sekvenční algoritmus časovou složitost kolem 5, 10 a 15 minut.
+ Pro meření čas potřebný na čtení dat z disku a uložení na disk neuvažujte
+ a zakomentujte ladící tisky, logy, zprávy a výstupy.
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Měřte paralelní čas při použití 
+\begin_inset Formula $i=2,\cdot,32$
+\end_inset
+
+ procesorů na sítích Ethernet a InfiniBand.
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+item Pri mereni kazde instance problemu na dany pocet procesoru spoctete
+ pro vas algoritmus dynamicke delby prace celkovy pocet odeslanych zadosti
+ o praci, prumer na 1 procesor a jejich uspesnost.
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+item Mereni pro dany pocet procesoru a instanci problemu provedte 3x a pouzijte
+ prumerne hodnoty.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Z naměřených dat sestavte grafy zrychlení 
+\begin_inset Formula $S(n,p)$
+\end_inset
+
+.
+ Zjistěte, zda a za jakych podmínek došlo k superlineárnímu zrychlení a
+ pokuste se je zdůvodnit.
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Vyhodnoďte komunikační složitost dynamického vyvažování zátěže a posuďte
+ vhodnost vámi implementovaného algoritmu pro hledání dárce a dělení zásobníku
+ pri řešení vašeho problému.
+ Posuďte efektivnost a škálovatelnost algoritmu.
+ Popište nedostatky vaší implementace a navrhněte zlepšení.
+ 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Empiricky stanovte granularitu vaší implementace, tj., stupeň paralelismu
+ pro danou velikost řešeného problému.
+ Stanovte kritéria pro stanovení mezí, za kterými již není učinné rozkládat
+ výpočet na menší procesy, protože by komunikační náklady prevážily urychlení
+ paralelním výpočtem.
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Závěr
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Celkové zhodnocení semestrální práce a zkušenosti získaných během semestru.
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Literatura
+\end_layout
+
+\begin_layout Section
+
+\series bold
+Přílohy
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,566 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+oddsidemargin=-5mm 
+\backslash
+evensidemargin=-5mm 
+\backslash
+marginparwidth=.08in
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+marginparsep=.01in 
+\backslash
+marginparpush=5pt 
+\backslash
+topmargin=-15mm
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+headheight=12pt 
+\backslash
+headsep=25pt 
+\backslash
+footheight=12pt 
+\backslash
+footskip=30pt
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+textheight=25cm 
+\backslash
+textwidth=17cm 
+\backslash
+columnsep=2mm 
+\backslash
+columnseprule=1pt
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+parindent=15pt
+\backslash
+parskip=2pt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\series bold
+Semestralní projekt MI-PAR 2014/2015:
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[5mm]
+\end_layout
+
+\end_inset
+
+ Paralelní algoritmus pro řešení problému
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[5mm]
+\end_layout
+
+\end_inset
+
+ Matěj Židek
+\begin_inset Newline newline
+\end_inset
+
+ Kryštof Šplíchal
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2mm]
+\end_layout
+
+\end_inset
+
+ magisterské studium, FIT ČVUT, Kolejní 550/2, 160 00 Praha 6
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+
+\backslash
+[2mm]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+today
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+Definice problému
+\end_layout
+
+\begin_layout Subsection
+Vstupní data
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+a, b
+\family default
+ = přirozená čísla, 
+\family typewriter
+a≥b≥5
+\family default
+, reprezentující délky stran hrací plochy 
+\family typewriter
+S
+\family default
+ o velikosti 
+\family typewriter
+a x b, F
+\family default
+ = množina 5 kostek hry Tetris a jejich rotací 
+\end_layout
+
+\begin_layout Subsection
+Úkol
+\end_layout
+
+\begin_layout Standard
+Úkolem bylo nalézt zaplnění plochy 
+\family typewriter
+S
+\family default
+ tak, aby nezaplněný zbytek byl co minimální a četnost použitých kostek
+ byla co nejvíce rovnoměrná.
+ Nebo-li minimalizovat funkci:
+\begin_inset Formula 
+\[
+Q(a,b)\text{=\left(1+\frac{p}{ab}\right)*\left(|C_{i}-\min(C)|\right)}
+\]
+
+\end_inset
+
+, kde 
+\family typewriter
+p
+\family default
+ je počet nezaplněných políček plochy 
+\family typewriter
+S
+\family default
+ a 
+\family typewriter
+C
+\family default
+ reprezentuje jejich četnost.
+\end_layout
+
+\begin_layout Subsection
+Sekvenční algoritmus
+\end_layout
+
+\begin_layout Standard
+Sekvenční algoritmus je typu 
+\family typewriter
+BB-DFS
+\family default
+ s hloubkou prohledávaného prostoru omezenou na
+\family typewriter
+ a x b
+\family default
+.
+ Řešení vždy existuje.
+ Přípustný koncový stav je situace, kdy do hrací plochy již nemůžeme přidat
+ další kostky.
+ Cena, kterou optimalizujeme, je minimální zbytek a rovnoměrnost použitých
+ kostek, tj.
+ funkci 
+\family typewriter
+Q
+\family default
+.
+ Algoritmus končí, když je cena rovna dolní mezi a nebo když prohledá celý
+ stavový prostor.
+ Dolní mez na cenu řešení je 1, tj.
+ všechny kostky jsou použity stejněkrát a celá plocha 
+\family typewriter
+S
+\family default
+ je zaplněna.
+\end_layout
+
+\begin_layout Section
+Popis sekvenčního algoritmu
+\end_layout
+
+\begin_layout Subsection
+Popis jednotlivých prvků aplikace
+\end_layout
+
+\begin_layout Standard
+Kostky jsou znázorněny v souboru 
+\family typewriter
+state.h
+\family default
+.
+ Porovnávání jejich tvarů obstarávají funkce souboru 
+\family typewriter
+fitting.c
+\family default
+.
+ Pro realizaci zásobníku jsme zvolili obousměrně zřetězený spojový seznam
+ uzlů, ve kterých je uložena hloubka, stav, informace o tom, zda z uzlu
+ byla provedena expanze
+\end_layout
+
+\begin_layout Section
+Popis paralelního algoritmu a jeho implementace v MPI
+\end_layout
+
+\begin_layout Subsection
+Paralelní BB-DFS s vždy úplným prohledáváním stavového prostoru (PBB-DFS-V)
+\end_layout
+
+\begin_layout Standard
+Všechny procesory vědí nebo se dozvědí hodnotu horní meze ceny řešení a
+ hodnota dolní meze není známa.
+ Pak stačí, aby si každý procesor lokálně udržoval informaci o svém dosud
+ nejlepším řešení.
+ Po vyprázdnění všech zásobníků se provede distribuované ukončení výpočtu
+ pomocí algoritmu 
+\family typewriter
+ADUV
+\family default
+ a pak pomocí paralelní redukce se ze všech nejlepších lokálních řešení
+ vybere globálně nejlepší.
+\end_layout
+
+\begin_layout Subsection
+Metoda dělení zásobníku u dna D-ADZ
+\end_layout
+
+\begin_layout Standard
+Žadatel obdrží zásobník s jednou polovinou stavu co nejblíže dnu.
+\end_layout
+
+\begin_layout Subsection
+ADUV
+\end_layout
+
+\begin_layout Standard
+Každý procesor může být obarven 2 barvami, 
+\family typewriter
+B
+\family default
+ nebo 
+\family typewriter
+W
+\family default
+.
+ Na počátku mají procesory barvu 
+\family typewriter
+W
+\family default
+.
+ Pro zjištění, zda může celý výpočet skončit, cirkuluje mezi procesory pešek,
+ který může být také dvou barev, 
+\family typewriter
+B
+\family default
+ a 
+\family typewriter
+W
+\family default
+.
+ Algoritmus ukončení funguje takto:
+\end_layout
+
+\begin_layout Enumerate
+Jakmile se první procesor 
+\family typewriter
+P1
+\family default
+ stane idle, nastaví svou barvu na 
+\family typewriter
+W
+\family default
+ a pošle peška barvy 
+\family typewriter
+W
+\family default
+ procesoru 
+\family typewriter
+P2
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Jestliže procesor 
+\family typewriter
+Pi
+\family default
+ pošle práci procesoru 
+\family typewriter
+Pj
+\family default
+, kde
+\family typewriter
+ i>j,
+\family default
+ pak 
+\family typewriter
+Pi
+\family default
+ nastaví svou barvu na 
+\family typewriter
+B
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Jestliže 
+\family typewriter
+Pi
+\family default
+ obdrží peška, pak má-li 
+\family typewriter
+Pi
+\family default
+ barvu 
+\family typewriter
+B
+\family default
+, nastaví barvu peška na 
+\family typewriter
+B
+\family default
+.
+ Jakmile se 
+\family typewriter
+Pi
+\family default
+ stane idle, pošle peška po kružnici procesoru 
+\family typewriter
+Pi+1
+\family default
+ a nastaví svoji barvu na 
+\family typewriter
+W
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Pokud 
+\family typewriter
+P1
+\family default
+ obdrží zpět peška barvy 
+\family typewriter
+W
+\family default
+, je možné výpočet ukončit.
+ Pokud má pešek barvu 
+\family typewriter
+B
+\family default
+, 
+\family typewriter
+P1
+\family default
+ zahájí nové kolo vysláním barvy 
+\family typewriter
+W
+\family default
+ procesoru 
+\family typewriter
+P2
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Ukončení je detekováno, jakmile 
+\family typewriter
+P1
+\family default
+ obdrží zpět peška v barvě 
+\family typewriter
+W
+\family default
+.
+\end_layout
+
+\begin_layout Section
+Naměřené výsledky a vyhodnocení
+\end_layout
+
+\begin_layout Section
+Závěr
+\end_layout
+
+\begin_layout Section
+Literatura
+\end_layout
+
+\begin_layout Section
+Přílohy
+\end_layout
+
+\end_body
+\end_document
