@@ -1,3 +1,5 @@
 .idea/
 wip/
 bin/
+*.o
+tetris

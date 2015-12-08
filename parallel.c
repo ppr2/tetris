@@ -21,6 +21,9 @@ MPI_Request *solutionRequests;
 int *solutionArray;
 extern Node *stackTop;
 
+/*
+ * Send initial work from p0 and receive it in another procesess
+ * */
 void parallelInit(int my_rank) {
     //if(DEBUG_PARALLEL){printf("---(%d) Parallel init \n", my_rank);}
 
@@ -56,15 +59,16 @@ void parallelInit(int my_rank) {
                 if(DEBUG_PARALLEL){printf("---(%d) Incoming serialized array: ,[", my_rank); for(int i=0;i<dataLength;i++){printf("%d,",dataArray[i]);} printf("]\n");stackPrintOutCompact();}
                 break;
             default:
-                //TODO ERROR
-                printf("error aaaaaaaaaaaaaaaaaaaa\n");
+                if(DEBUG_PARALLEL){printf("---(%d) Error occured in init, received tag %d", my_rank, status.MPI_TAG);}
                 MPI_Finalize();
                 exit(1);
         }
     }
 }
 
-
+/*
+ * Handle received token
+ * */
 void processToken(int my_rank, int p_cnt, int token) {
     if (my_rank == 0) {
         // It came through the whole circle

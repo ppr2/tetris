@@ -135,10 +135,8 @@ int stackSplit(State **states, int half) {
         for (i = 0; i < nodesToCutCount; i++) {
             (*states)[i] = *node->state;
             if(DEBUG_PARALLEL){printf("---(%d) State[%d] (%d,%d,%d)\n", my_rank, i, (*states)[i].index, (*states)[i].shape, (*states)[i].depth);};
-            // todo free
             previous = node->previous;
 
-            //TODO free what is to be freed, but allow sending of data
             if(DEBUG_PARALLEL){printf("---(%d) about to free node %d %d %d\n", my_rank, node->state->index, node->state->shape, node->state->depth);};
             freeNode(node);
             node = previous;
@@ -194,10 +192,7 @@ int getArrayFromStackAndMap(int *arr, State *states, int statesCount){
         statesToSerialize[counter+1] = (int) (states + i)->shape;
         statesToSerialize[counter+2] = (states + i)->depth;
         counter += 3;
-        //getArrayFromState(statesToSerialize, states + i, counter_p);
         state = states + i;
-        if(DEBUG_PARALLEL){printf("---(%d) freeing at i=%d\n", my_rank, i);};
-        //free(&state);
     }
 
     // Save to arr
